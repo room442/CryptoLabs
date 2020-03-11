@@ -3,6 +3,7 @@ from Crypto.Cipher import AES
 import hashlib
 import argparse
 import rsa  # for keys
+import random
 
 
 def auto_int(x):
@@ -10,19 +11,14 @@ def auto_int(x):
 
 
 parser = argparse.ArgumentParser(description='RSA encoder and digital signature generator')
-parser.add_argument("e",
-                    help="open exponent of the key")
 
-parser.add_argument("n",
-                    type=auto_int,
-                    help="modulus")
+parser.add_argument("BITS",
+                    nargs="?",
+                    default=1024,
+                    help="Number of bits, default = 1024")
 
-args = parser.add_argument("BITS",
-                           default=1024,
-                           help="Number of bits, default = 1024")
+args = parser.parse_args()
 
-print('exp = \"' + str(hex(args.e)[2:len(str(hex(args.e)))]) + '\"')
-print('n')
 
 # password = b"ibks"
 # key = hashlib.sha256(password).digest()
