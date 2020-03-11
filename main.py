@@ -18,8 +18,8 @@ parser.add_argument('SCHEME',
                     help='Name of file with scheme settings in asn.1 representation. Only e and n are required.')
 
 parser.add_argument('OUTPUT',
-                    nargs='?',
-                    default='encrypted.bin',
+                    # nargs='?',
+                    # default='encrypted.bin',
                     # type = open,
                     help='Name of output file (encrypted text or digital sign file)')
 
@@ -73,8 +73,7 @@ print(args.OUTPUT)
 # print(bytestring)
 
 
-# -->
-# <--
+
 
 # print()
 # test_val = bytes(0x303F31323030040200010C04746573743015021011317E789C45CCCC7436C384D43549450201033000300B02090A0B0C0A0B0C0A0B0C3009040201210203133870)
