@@ -17,7 +17,7 @@ parser.add_argument("n",
 
 args = parser.parse_args()
 
-print('exp = \"' + str(hex(args.n)[2:len(str(hex(args.n)))]) + '\"')
+print('exp = \"' + str(hex(args.e)[2:len(str(hex(args.e)))]) + '\"')
 
 # password = b"ibks"
 # key = hashlib.sha256(password).digest()
