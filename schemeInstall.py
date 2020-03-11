@@ -2,10 +2,12 @@ import asn1
 from Crypto.Cipher import AES
 import hashlib
 import argparse
-from sage.all import *
+import rsa  # for keys
+
 
 def auto_int(x):
     return int(x, 0)
+
 
 parser = argparse.ArgumentParser(description='RSA encoder and digital signature generator')
 parser.add_argument("e",
@@ -15,9 +17,12 @@ parser.add_argument("n",
                     type=auto_int,
                     help="modulus")
 
-args = parser.parse_args()
+args = parser.add_argument("BITS",
+                           default=1024,
+                           help="Number of bits, default = 1024")
 
 print('exp = \"' + str(hex(args.e)[2:len(str(hex(args.e)))]) + '\"')
+print('n')
 
 # password = b"ibks"
 # key = hashlib.sha256(password).digest()
@@ -38,7 +43,6 @@ print('exp = \"' + str(hex(args.e)[2:len(str(hex(args.e)))]) + '\"')
 # print("encoded asn.1:", encoded_bytes_str)
 
 
-
 # decoder.start(encoded_bytes)
 # while True:
 #     if decoder.peek() is None:
@@ -50,13 +54,10 @@ print('exp = \"' + str(hex(args.e)[2:len(str(hex(args.e)))]) + '\"')
 #         print("New value: ", decoder.read())
 
 
-
 # test_val = 0x303F31323030040200010C04746573743015021011317E789C45CCCC7436C384D43549450201033000300B02090A0B0C0A0B0C0A0B0C3009040201210203133870
 # print(str(format(test_val, "X")))
 # bytestring = test_val.to_bytes(((len(bin(test_val)) - 2)//8 + 1), 'big')
 # print(bytestring)
-
-
 
 
 # print()
