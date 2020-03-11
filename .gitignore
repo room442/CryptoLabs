@@ -1,1 +1,11 @@
 # Created by .ignore support plugin (hsz.mobi)
+.idea/.gitignore
+.idea/RSA.iml
+.idea/deployment.xml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+opentext.txt
+venv/
+venv_sagepy/
