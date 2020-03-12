@@ -1,9 +1,6 @@
-import asn1
-from Crypto.Cipher import AES
-import hashlib
 import argparse
 import rsa  # for keys
-import random
+
 
 
 def auto_int(x):
@@ -26,9 +23,6 @@ args = parser.parse_args()
 exp = 0x10001
 
 pubkey, privkey = rsa.newkeys(args.BITS, exponent=exp)
-
-# print(pubkey)
-# print(privkey)
 
 try:
     mystr = "exp = \"" + str(hex(exp)[2:]) + "\"" + "\n" +\

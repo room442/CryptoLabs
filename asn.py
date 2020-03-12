@@ -48,7 +48,7 @@ def encode(
     return encoder.output()
 
 
-def decode(filename): # type: (filename) -> (n, e, c, ciphertext)
+def decode(filename):  # type: (filename) -> (n, e, c, ciphertext)
     integers = []  # list of integers in ASN.1 file
     cipher = bytearray()
     with open(filename, "rb") as file:
@@ -56,7 +56,7 @@ def decode(filename): # type: (filename) -> (n, e, c, ciphertext)
         decoder = asn1.Decoder()
         decoder.start(data)
         integers = parse(decoder, integers)
-        cipher = data[-integers[-1]:] #get last integrs[last] symbols, this is ciphertext
+        cipher = data[-integers[-1]:]  # get last integrs[last] symbols, this is ciphertext
     return integers[0], integers[1], integers[2], cipher
 
 
@@ -73,8 +73,6 @@ def parse(decoder, integers):
 
                 if tag.nr == asn1.Numbers.Integer:
                     integers.append(value)
-
-
 
             else:
                 decoder.enter()
