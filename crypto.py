@@ -2,7 +2,6 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
 
-import hashlib
 
 iv = b'\x00' * AES.block_size
 
@@ -27,6 +26,6 @@ def AES256encrypt(data):
 def AES256decrypt(data, key):
     decipher = AES.new(key, AES.MODE_CBC, iv)
 
-    decrypted = decipher.decrypt(unpad(data, AES.block_size))
+    decrypted = unpad(decipher.decrypt(data), AES.block_size)
 
     return decrypted
