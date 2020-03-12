@@ -23,13 +23,16 @@ args = parser.parse_args()
 exp = 0x10001
 
 pubkey, privkey = rsa.newkeys(args.BITS, exponent=exp)
+signpubkey, signprivkey = rsa.newkeys(1024, exponent=exp)
 
 try:
-    mystr = "exp = \"" + str(hex(exp)[2:]) + "\"" + "\n" +\
-            "n = \"" + str(hex(pubkey.n))[2:] + "\"" + "\n" + \
+    mystr = "exp = \"" + str(hex(exp)[2:]) + "\"" + "\n"\
+            "n = \"" + str(hex(pubkey.n))[2:] + "\"" + "\n"\
             "d = \"" + str(hex(privkey.d))[2:] + "\"" + "\n"\
             "p = \"" + str(hex(privkey.p))[2:] + "\"" + "\n"\
-            "q = \"" + str(hex(privkey.q))[2:] + "\""
+            "q = \"" + str(hex(privkey.q))[2:] + "\"" + "\n"\
+            "sign_n = \"" + str(hex(signpubkey.n))[2:] + "\"" + "\n"\
+            "sign_d = \"" + str(hex(signprivkey.d))[2:] + "\""
     with open(args.f, "w") as file:
         file.write(mystr)
 except:

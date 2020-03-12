@@ -6,16 +6,27 @@ from params import *
 
 def parse_args():
     parser = argparse.ArgumentParser(description='RSA encoder and idgital signature generator')
-    parser.add_argument("--file",
+    parser.add_argument("FILE",
                         help="Name of input file")
 
     parser.add_argument("-e", "--encrypt",
                         action="store_true",
-                        help="Name of file with scheme settings in asn.1 representation. Only e and n are required.")
+                        help="Encrypt FILE")
 
     parser.add_argument('-d', "--decrypt",
                         action="store_true",
-                        help='Name of output file (encrypted text or digital sign file)')
+                        help='Decrypt FILE')
+
+    parser.add_argument("-s", "--sign",
+                        action="store_true",
+                        help="Sign FILE")
+
+    parser.add_argument("-c", "--check",
+                        action="store_true",
+                        help="Check FILE signaruture, given by --sfile")
+
+    parser.add_argument("--sfile",
+                        help="Name of signature file")
 
     return parser.parse_args()
 
@@ -46,6 +57,7 @@ def encrypt(filename):
     with open(filename + ".enc", "wb") as file:
         file.write(encoded)
 
+
 def decrypt(filename):
     n, e, encrypted_key, encrypted = decode(filename)
 
@@ -66,11 +78,45 @@ def decrypt(filename):
     with open(filename + ".dec", "wb") as file:
         file.write(decrypted)
 
+
+def addSignature(filename):
+    with open(filename + ".sign", "wb") as file:
+        file.write(
+            encodeSign(
+                int(sign_n, 16),
+                int(sign_d, 16),
+                RSAsignAdd(filename,
+                           int(sign_d, 16),
+                           int(sign_n, 16)
+                           )
+            )
+        )
+
+
+def checkSignature(filename, sig_filename):
+    n, sign = decodeSign(sig_filename)
+    return RSAsignCheck(
+        filename,
+        int(exp, 16),
+        n,
+        sign
+    )
+
+
 if __name__ == '__main__':
     args = parse_args()
 
     if args.encrypt:
-        encrypt(args.file)
+        encrypt(args.FILE)
 
     if args.decrypt:
-        decrypt(args.file)
+        decrypt(args.FILE)
+
+    if args.sign:
+        addSignature(args.FILE)
+
+    if args.check:
+        if args.sfile is None:
+            print("You should give the signature file by --sfile command")
+            exit(1)
+        print("Sign check: " + str(checkSignature(args.FILE, args.sfile)))

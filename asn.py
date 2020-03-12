@@ -60,6 +60,57 @@ def decode(filename):  # type: (filename) -> (n, e, c, ciphertext)
     return integers[0], integers[1], integers[2], cipher
 
 
+def encodeSign(
+        n,
+        e,
+        sign
+):
+    encoder = asn1.Encoder()
+
+    encoder.start()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.enter(asn1.Numbers.Set)
+    encoder.enter(asn1.Numbers.Sequence)
+
+    encoder.write(b'\x00\x40', asn1.Numbers.OctetString)
+    encoder.write(b'\x0C\x00', asn1.Numbers.UTF8String)
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.write(n, asn1.Numbers.Integer)
+    encoder.write(e, asn1.Numbers.Integer)
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.write(sign, asn1.Numbers.Integer)
+    encoder.leave()
+
+    encoder.leave()
+
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.leave()
+
+    encoder.leave()
+
+    return encoder.output()
+
+
+def decodeSign(filename): # type: (filename) -> (n, sign)
+    integers = []  # list of integers in ASN.1 file
+    cipher = bytearray()
+    with open(filename, "rb") as file:
+        data = file.read()
+        decoder = asn1.Decoder()
+        decoder.start(data)
+        integers = parse(decoder, integers)
+    return integers[0], integers[2]
+
+
 def parse(decoder, integers):
     while not decoder.eof():
         try:
