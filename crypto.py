@@ -1,5 +1,7 @@
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad, unpad
+
 import hashlib
 
 iv = b'\x00' * AES.block_size
@@ -13,19 +15,18 @@ def RSAdecrypt(c, d, n):
     return pow(c, d, n)
 
 
-def encryptAES256(data):
-    # key = get_random_bytes(32)
-    key = b'12341234123412341234123412341234'
+def AES256encrypt(data):
+    key = get_random_bytes(AES.key_size[-1])
     cipher = AES.new(key, AES.MODE_CBC, iv)
 
-    ciphertext = cipher.encrypt(data)
+    ciphertext = cipher.encrypt(pad(data, AES.block_size))
 
     return ciphertext, key
 
 
-def decryptAES256(data, key):
+def AES256decrypt(data, key):
     decipher = AES.new(key, AES.MODE_CBC, iv)
 
-    decrypted = decipher.decrypt(data)
+    decrypted = decipher.decrypt(unpad(data, AES.block_size))
 
     return decrypted
