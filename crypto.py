@@ -2,6 +2,8 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
 from hashlib import sha256
+from random import randint
+from util import modinv
 
 iv = b'\x00' * AES.block_size
 
@@ -52,3 +54,27 @@ def AES256decrypt(data, key):
     decrypted = unpad(decipher.decrypt(data), AES.block_size)
 
     return decrypted
+
+
+def ELGSignAdd(filename, x, a, p, r):
+    with open(filename, "rb") as file:
+        data = file.read()
+
+    m = sha256(data).hexdigest()
+    k = randint(1, r)
+    w = pow(a, k, p)
+    s = ((m - x * w) * modinv(k, r)) % r
+
+    return w, s
+
+
+def ELGSignCheck(filename, a, b, p, w, s):
+    if w < p:
+        return False
+
+    with open(filename, "rb") as file:
+        data = file.read()
+
+    m = sha256(data).hexdigest()
+
+    return pow(a, m, p) == (pow(b, w, p) * pow(w, s, p)) % p
