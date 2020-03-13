@@ -2,10 +2,11 @@ import argparse
 import rsa  # for keys
 from sympy import nextprime, gcd, randprime, is_primitive_root
 from random import randint
+from util import auto_int
 
 
-def auto_int(x):
-    return int(x, 0)
+
+
 
 
 def get_args():
