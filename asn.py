@@ -102,7 +102,6 @@ def RSAencodeSign(
 
 def RSAdecodeSign(filename): # type: (filename) -> (n, sign)
     integers = []  # list of integers in ASN.1 file
-    cipher = bytearray()
     with open(filename, "rb") as file:
         data = file.read()
         decoder = asn1.Decoder()
@@ -119,23 +118,6 @@ def ELGencodeSign(
         s,
         b
 ):
-
-    '''Подписью сообщения является последовательность чисел:
-ElGamalSign ::= SEQUENCE {
-     – INTEGER,
-      – INTEGER
-}
-Ключом является последовательность:
-ElGamalSignPublicKey ::= SEQUENCE {
-      – INTEGER – открытый ключ
-}
-Параметры протокола содержат параметры группы  : характеристику поля, порядок группы и образующую:
-ElGamalSignParameters ::= SEQUENCE {
-     prime INTEGER, – число
-       INTEGER, – порядок группы
-     generator INTEGER – образующая
-}
-'''
 
     encoder = asn1.Encoder()
 
@@ -173,6 +155,15 @@ ElGamalSignParameters ::= SEQUENCE {
     encoder.leave()
 
     return encoder.output()
+
+def ELGdecodeSign(filename): #type: (filename) -> (b, p, r, a, w, s)
+    integers = []  # list of integers in ASN.1 file
+    with open(filename, "rb") as file:
+        data = file.read()
+        decoder = asn1.Decoder()
+        decoder.start(data)
+        integers = parse(decoder, integers)
+    return integers
 
 
 def parse(decoder, integers):
