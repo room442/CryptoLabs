@@ -1,5 +1,5 @@
-from asn import *
-from crypto import *
+import asn
+import crypto
 import argparse
 from params import *
 
@@ -34,9 +34,9 @@ def parse_args():
 def encrypt(filename):
     with open(filename, "rb") as file:
         data = file.read()
-        encrypted, key = AES256encrypt(data)
+        encrypted, key = crypto.AES256encrypt(data)
 
-    encrypted_key = RSAencrypt(
+    encrypted_key = crypto.RSAencrypt(
         int.from_bytes(key, "big"),
         int(exp, 16),
         int(n, 16)
@@ -46,7 +46,7 @@ def encrypt(filename):
     print("d = ", d)
     print("n = ", n)
 
-    encoded = encode(
+    encoded = asn.RSAencode(
         int(n, 16),
         int(exp, 16),
         encrypted_key,
@@ -59,21 +59,21 @@ def encrypt(filename):
 
 
 def decrypt(filename):
-    n, e, encrypted_key, encrypted = decode(filename)
+    n, e, encrypted_key, encrypted = asn.RSAdecode(filename)
 
     print("e = ", e)
     print("d = ", d)
     print("n = ", n)
 
-    key = RSAdecrypt(
+    key = crypto.RSAdecrypt(
         encrypted_key,
         int(d, 16),
         n
     )
 
-    key = key.to_bytes(AES.key_size[-1], "big")
+    key = key.to_bytes(crypto.AES.key_size[-1], "big")
 
-    decrypted = AES256decrypt(encrypted, key)
+    decrypted = crypto.AES256decrypt(encrypted, key)
 
     with open(filename + ".dec", "wb") as file:
         file.write(decrypted)
@@ -82,10 +82,10 @@ def decrypt(filename):
 def addSignature(filename):
     with open(filename + ".sign", "wb") as file:
         file.write(
-            encodeSign(
+            asn.RSAencodeSign(
                 int(sign_n, 16),
                 int(sign_d, 16),
-                RSAsignAdd(filename,
+                crypto.RSAsignAdd(filename,
                            int(sign_d, 16),
                            int(sign_n, 16)
                            )
@@ -94,8 +94,8 @@ def addSignature(filename):
 
 
 def checkSignature(filename, sig_filename):
-    n, sign = decodeSign(sig_filename)
-    return RSAsignCheck(
+    n, sign = asn.RSAdecodeSign(sig_filename)
+    return crypto.RSAsignCheck(
         filename,
         int(exp, 16),
         n,

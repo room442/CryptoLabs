@@ -3,7 +3,7 @@
 import asn1
 
 
-def encode(
+def RSAencode(
         n,
         e,
         c,  # encrypted aes256 key
@@ -48,7 +48,7 @@ def encode(
     return encoder.output()
 
 
-def decode(filename):  # type: (filename) -> (n, e, c, ciphertext)
+def RSAdecode(filename):  # type: (filename) -> (n, e, c, ciphertext)
     integers = []  # list of integers in ASN.1 file
     cipher = bytearray()
     with open(filename, "rb") as file:
@@ -60,7 +60,7 @@ def decode(filename):  # type: (filename) -> (n, e, c, ciphertext)
     return integers[0], integers[1], integers[2], cipher
 
 
-def encodeSign(
+def RSAencodeSign(
         n,
         e,
         sign
@@ -100,7 +100,7 @@ def encodeSign(
     return encoder.output()
 
 
-def decodeSign(filename): # type: (filename) -> (n, sign)
+def RSAdecodeSign(filename): # type: (filename) -> (n, sign)
     integers = []  # list of integers in ASN.1 file
     cipher = bytearray()
     with open(filename, "rb") as file:
