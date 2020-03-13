@@ -26,10 +26,10 @@ def get_args():
 
     return parser.parse_args()
 
-def gen_rsa(filename):
+def gen_rsa(filename, bits):
     exp = 0x10001
 
-    pubkey, privkey = rsa.newkeys(args.BITS, exponent=exp)
+    pubkey, privkey = rsa.newkeys(bits, exponent=exp)
     signpubkey, signprivkey = rsa.newkeys(1024, exponent=exp)
 
 
@@ -53,6 +53,7 @@ def gen_rsa(filename):
 
 
 def gen_elg(filename):
+
     pass
 
 if __name__ == '__main__':
