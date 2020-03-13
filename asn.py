@@ -113,7 +113,7 @@ def RSAdecodeSign(filename): # type: (filename) -> (n, sign)
 def ELGencodeSign(
         prime, #p
         r, #r
-        generator, #
+        generator, #a
         w,
         s,
         b
@@ -127,7 +127,8 @@ def ELGencodeSign(
     encoder.enter(asn1.Numbers.Set)
     encoder.enter(asn1.Numbers.Sequence)
 
-    encoder.write(b'\x80\x06\x02\x00', asn1.Numbers.OctetString)
+    encoder.write(b'\x80\x06', asn1.Numbers.OctetString)
+    # encoder.write(b'\x02\x00', asn1.Numbers.OctetString)
     encoder.write(b'ELG Sign', asn1.Numbers.UTF8String)
 
     encoder.enter(asn1.Numbers.Sequence)
@@ -135,9 +136,9 @@ def ELGencodeSign(
     encoder.leave()
 
     encoder.enter(asn1.Numbers.Sequence)
-    encoder.write(prime, asn1.Numbers.Sequence)
-    encoder.write(r, asn1.Numbers.Sequence)
-    encoder.write(generator, asn1.Numbers.Sequence)
+    encoder.write(prime, asn1.Numbers.Integer)
+    encoder.write(r, asn1.Numbers.Integer)
+    encoder.write(generator, asn1.Numbers.Integer)
     encoder.leave()
 
     encoder.enter(asn1.Numbers.Sequence)
