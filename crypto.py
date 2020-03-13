@@ -60,7 +60,7 @@ def ELGSignAdd(filename, x, a, p, r):
     with open(filename, "rb") as file:
         data = file.read()
 
-    m = sha256(data).hexdigest()
+    m = sha256(data).hexdigest() % r
     k = randint(1, r)
     w = pow(a, k, p)
     s = ((m - x * w) * modinv(k, r)) % r
@@ -68,13 +68,13 @@ def ELGSignAdd(filename, x, a, p, r):
     return w, s
 
 
-def ELGSignCheck(filename, a, b, p, w, s):
+def ELGSignCheck(filename, a, b, p, r, w, s):
     if w < p:
         return False
 
     with open(filename, "rb") as file:
         data = file.read()
 
-    m = sha256(data).hexdigest()
+    m = sha256(data).hexdigest() % r
 
     return pow(a, m, p) == (pow(b, w, p) * pow(w, s, p)) % p
