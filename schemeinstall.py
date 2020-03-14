@@ -1,7 +1,7 @@
 import argparse
 import rsa  # for keys
 
-
+# You can generate RSA params by hands, need gen p, q -- BITS-bit primes, n = p*q, d = utils.modinv(e, n)
 
 def auto_int(x):
     return int(x, 0)
