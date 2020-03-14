@@ -10,7 +10,7 @@ async def tcp_client(ip, port, p, encrypted, key, a, loop, len):
 
     writer.write(MOencodeParams(p, p-1, MOencrypt(int.from_bytes(key, "big"), a, p)))
 
-    t_ab = MOdecodeResponse(await reader.read(100))
+    t_ab = MOdecodeResponse(await reader.read())
 
     writer.write(MOencodeFinish(MOdecrypt(t_ab, a, p), len, encrypted))
 
