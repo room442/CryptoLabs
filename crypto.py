@@ -65,8 +65,6 @@ def ELGSignAdd(filename, x, a, p, r):
 
         return k
 
-
-
     with open(filename, "rb") as file:
         data = file.read()
 
@@ -88,3 +86,11 @@ def ELGSignCheck(filename, a, b, p, r, w, s):
     m = int(sha256(data).hexdigest(),16) % r
 
     return pow(a, m, p) == ((pow(b, w, p) * pow(w, s, p)) % p)
+
+
+def MOencrypt(m, k, p):
+    return pow(m, k, p)
+
+
+def MOdecrypt(c, k, p):
+    return pow(c, modinv(k, p), p)
