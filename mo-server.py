@@ -1,33 +1,33 @@
 import asyncio
 from random import randint
 from asn import MOdecodeParams, MOencodeResponse, MOdecodeFinish
-from crypto import MOencrypt, MOdecrypt, AES256decrypt
+from crypto import MOencrypt, MOdecrypt, AES256decrypt, AES
 
+import socket
 
-async def handle_client(reader, writer):
-    p, r, t_a = MOdecodeParams(await reader.read())
+ip = "127.0.0.1"
+port = 8888
+
+# Настраиваем сокет
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((ip, port))
+server_socket.listen(10)
+
+# Слушаем запросы
+while True:
+    connection, address = server_socket.accept()
+
+    p, r, t_a = MOdecodeParams(connection.recv(1024))
     b = randint(2, r - 1)
-    writer.write(MOencodeResponse(MOencrypt(t_a, b, p)))
-    t_b, len, encrypted = MOdecodeFinish(await reader.read())
-    t = MOdecrypt(t_b, b, p)
-    opentext = AES256decrypt(encrypted, t)
+    connection.send(MOencodeResponse(MOencrypt(t_a, b, p)))
+    t_b, len, encrypted = MOdecodeFinish(connection.recv(1024))
+    if len > 1024:
+        rcv = 1024
+        while rcv < len:
+            encrypted = encrypted + connection.recv(1024)
+            rcv = rcv + 1024
+
+    t = MOdecrypt(t_b, b, p)  # fixme: t != key
+    opentext = AES256decrypt(encrypted, t.to_bytes(AES.key_size[-1], "big"))
     print(opentext)
-
-    writer.close()
-
-
-loop = asyncio.get_event_loop()
-coro = asyncio.start_server(handle_client, '127.0.0.1', 8888, loop=loop)
-server = loop.run_until_complete(coro)
-
-# Serve requests until Ctrl+C is pressed
-print('Serving on {}'.format(server.sockets[0].getsockname()))
-try:
-    loop.run_forever()
-except KeyboardInterrupt:
-    pass
-
-# Close the server
-server.close()
-loop.run_until_complete(server.wait_closed())
-loop.close()
+    connection.close()
