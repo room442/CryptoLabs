@@ -6,3 +6,9 @@ venv_sagepy/
 __pycache__/
 params.py
 test.asn
+
+*.enc
+
+*.dec
+
+*.sign
