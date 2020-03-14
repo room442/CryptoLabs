@@ -172,6 +172,7 @@ def MOencodeParams(  # A --(params, t_a)-> B
         t_a
 ):
     encoder = asn1.Encoder()
+    encoder.start()
 
     encoder.enter(asn1.Numbers.Sequence)  # 1
     encoder.enter(asn1.Numbers.Set)  # 2
@@ -207,6 +208,7 @@ def MOencodeResponse(  # A <--(t_ab)-- B
         t_ab
 ):
     encoder = asn1.Encoder()
+    encoder.start()
 
     encoder.enter(asn1.Numbers.Sequence)
     encoder.enter(asn1.Numbers.Set)
@@ -239,6 +241,7 @@ def MOencodeFinish(  # A --(t_b, cipher_params)-> B
         encrypted
 ):
     encoder = asn1.Encoder()
+    encoder.start()
 
     encoder.enter(asn1.Numbers.Sequence)
     encoder.enter(asn1.Numbers.Set)
@@ -274,6 +277,7 @@ def MOencodeMessage(  # after A and B get secret key t
         encrypted
 ):
     encoder = asn1.Encoder()
+    encoder.start()
 
     encoder.enter(asn1.Numbers.Sequence)
     encoder.enter(asn1.Numbers.Set)
