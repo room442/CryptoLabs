@@ -19,8 +19,6 @@ def get_args():
                         help="Number of bits, default = 1024")
 
     parser.add_argument("SCH",
-                        nargs="?",
-                        default="RSA",
                         type=str,
                         help="Scheme for wich generete params, RSA|ELG")
 
