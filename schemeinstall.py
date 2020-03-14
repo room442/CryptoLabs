@@ -60,10 +60,10 @@ def gen_elg(filename, bits):
 
     def gen_a(p):
         def gen_primitive_root(r):
-            a = randint(2**bits, 2**(bits+1))
+            a = randint(1, r)
             phi_r = r-1 #r is prime
             while pow(a, phi_r, r) != 1: #aways true, as r is prime
-                a = randint(2 ** bits, 2 ** bits)
+                a = randint(1, r)
 
             return a
 
