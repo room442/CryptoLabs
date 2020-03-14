@@ -100,7 +100,7 @@ def RSAencodeSign(
     return encoder.output()
 
 
-def RSAdecodeSign(filename): # type: (filename) -> (n, sign)
+def RSAdecodeSign(filename):  # type: (filename) -> (n, sign)
     integers = []  # list of integers in ASN.1 file
     with open(filename, "rb") as file:
         data = file.read()
@@ -111,14 +111,13 @@ def RSAdecodeSign(filename): # type: (filename) -> (n, sign)
 
 
 def ELGencodeSign(
-        prime, #p
-        r, #r
-        generator, #a
+        prime,  # p
+        r,  # r
+        generator,  # a
         w,
         s,
         b
 ):
-
     encoder = asn1.Encoder()
 
     encoder.start()
@@ -157,7 +156,8 @@ def ELGencodeSign(
 
     return encoder.output()
 
-def ELGdecodeSign(filename): #type: (filename) -> (b, p, r, a, w, s)
+
+def ELGdecodeSign(filename):  # type: (filename) -> (b, p, r, a, w, s)
     integers = []  # list of integers in ASN.1 file
     with open(filename, "rb") as file:
         data = file.read()
@@ -165,6 +165,177 @@ def ELGdecodeSign(filename): #type: (filename) -> (b, p, r, a, w, s)
         decoder.start(data)
         integers = parse(decoder, integers)
     return integers
+
+
+def MOencodeParams(  # A --(params, t_a)-> B
+        p,
+        r,  # r = p-1???
+        t_a
+):
+    encoder = asn1.Encoder()
+
+    encoder.enter(asn1.Numbers.Sequence)  # 1
+    encoder.enter(asn1.Numbers.Set)  # 2
+    encoder.enter(asn1.Numbers.Sequence)  # 3
+
+    encoder.write(b'\x08\x07\x02\x00', asn1.Numbers.OctetString)  # TODO: check if it works correctly
+    encoder.write(b'MO params and t^a', asn1.Numbers.UTF8String)
+
+    encoder.enter(asn1.Numbers.Sequence)  # 4
+    encoder.leave()  # 4
+
+    encoder.enter(asn1.Numbers.Sequence)  # 5
+    encoder.write(p, asn1.Numbers.Integer)
+    encoder.write(r, asn1.Numbers.Integer)
+    encoder.leave()  # 5
+
+    encoder.enter(asn1.Numbers.Sequence)  # 6
+    encoder.write(t_a, asn1.Numbers.Integer)
+    encoder.leave()  # 6
+
+    encoder.leave()  # 3
+    encoder.leave()  # 2
+
+    encoder.enter(asn1.Numbers.Sequence)  # 7
+    encoder.leave()  # 7
+
+    encoder.leave()  # 1
+
+    return encoder.output()
+
+
+def MOencodeResponse(  # A <--(t_ab)-- B
+        t_ab
+):
+    encoder = asn1.Encoder()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.enter(asn1.Numbers.Set)
+    encoder.enter(asn1.Numbers.Sequence)
+
+    encoder.write(b'\x08\x07\x02\x00', asn1.Numbers.OctetString)  # TODO: check if it works correctly
+    encoder.write("MO t^(ab) response")
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.write(t_ab, asn1.Numbers.Integer)
+    encoder.leave()
+    encoder.leave()
+    encoder.leave()
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.leave()
+    encoder.leave()
+
+    return encoder.output()
+
+
+def MOencodeFinish(  # A --(t_b, cipher_params)-> B
+        t_b,
+        len,
+        encrypted
+):
+    encoder = asn1.Encoder()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.enter(asn1.Numbers.Set)
+    encoder.enter(asn1.Numbers.Sequence)
+
+    encoder.write(b'\x08\x07\x02\x00', asn1.Numbers.OctetString)  # TODO: check if it works correctly
+    encoder.write("MO t^b and first message")
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.write(t_b, asn1.Numbers.Integer)
+    encoder.leave()
+    encoder.leave()
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.write(b'\x10\x82', asn1.Numbers.OctetString)  # AES CBC
+    encoder.write(len, asn1.Numbers.Integer)
+    encoder.leave()
+
+    encoder.leave()
+
+    encoder.write(encrypted)
+
+
+def MOencodeMessage(  # after A and B get secret key t
+        len,
+        encrypted
+):
+    encoder = asn1.Encoder()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.enter(asn1.Numbers.Set)
+    encoder.enter(asn1.Numbers.Sequence)
+
+    encoder.write(b'\x00\x00', asn1.Numbers.OctetString)
+    encoder.write("message")
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.leave()
+    encoder.leave()
+    encoder.leave()
+
+    encoder.enter(asn1.Numbers.Sequence)
+    encoder.write(b'\x10\x82', asn1.Numbers.OctetString)  # AES CBC
+    encoder.write(len, asn1.Numbers.Integer)
+    encoder.leave()
+
+    encoder.leave()
+
+    encoder.write(encrypted)
+
+
+def MOdecodeParams(data):  # type: (data) -> (p, r, t_a)
+    integers = []  # list of integers in ASN.1 file
+    decoder = asn1.Decoder()
+    decoder.start(data)
+    integers = parse(decoder, integers)
+    return integers[0], integers[1], integers[2]
+
+
+def MOdecodeResponse(data):  # type: (data) -> t_ab
+    integers = []  # list of integers in ASN.1 file
+    decoder = asn1.Decoder()
+    decoder.start(data)
+    integers = parse(decoder, integers)
+    return integers[0]
+
+
+def MOdecodeFinish(data):  # type: (data) -> (t_b, len, encrypted)
+    integers = []  # list of integers in ASN.1 file
+    decoder = asn1.Decoder()
+    decoder.start(data)
+    integers = parse(decoder, integers)
+    cipher = data[-integers[-1]:]  # get last integrs[last] symbols, this is ciphertext
+    return integers[0], integers[1], cipher
+
+
+def MOdecodeMessage(data): # type: (data) -> (len, encrypted)
+    integers = []  # list of integers in ASN.1 file
+    decoder = asn1.Decoder()
+    decoder.start(data)
+    integers = parse(decoder, integers)
+    cipher = data[-integers[-1]:]  # get last integrs[last] symbols, this is ciphertext
+    return integers[0],  cipher
 
 
 def parse(decoder, integers):
