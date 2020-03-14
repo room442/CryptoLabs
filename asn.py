@@ -50,7 +50,6 @@ def RSAencode(
 
 def RSAdecode(filename):  # type: (filename) -> (n, e, c, ciphertext)
     integers = []  # list of integers in ASN.1 file
-    cipher = bytearray()
     with open(filename, "rb") as file:
         data = file.read()
         decoder = asn1.Decoder()
