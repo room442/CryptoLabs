@@ -22,7 +22,7 @@ def get_args():
                         nargs="?",
                         default="RSA",
                         type=str,
-                        help="Scheme for wich generete params, RSA|ELG")
+                        help="Scheme for wich generete params, RSA|ELG|MO")
 
     parser.add_argument("-f",
                         help="file to save")
