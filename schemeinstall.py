@@ -4,7 +4,7 @@ from sympy import nextprime, gcd, randprime, is_primitive_root
 from random import randint
 from util import auto_int
 
-
+# You can generate RSA params by hands, need gen p, q -- BITS-bit primes, n = p*q, d = utils.modinv(e, n)
 
 
 
@@ -20,7 +20,7 @@ def get_args():
 
     parser.add_argument("SCH",
                         type=str,
-                        help="Scheme for wich generete params, RSA|ELG")
+                        help="Scheme for wich generete params, RSA|ELG|MO")
 
     parser.add_argument("-f",
                         help="file to save")
@@ -96,6 +96,15 @@ def gen_elg(filename, bits):
         print("r = \"" + str(hex(r))[2:] + "\"")
 
 
+def gen_mo(filename, bits):
+    r = randprime(2**bits, 2**(bits+1))
+    try:
+        mystr = "r = \"" + str(hex(r)[2:]) + "\""
+        with open(filename, "w") as file:
+            file.write(mystr)
+    except:
+        print("r = \"" + str(hex(r)[2:])+ "\"")
+
 if __name__ == '__main__':
     args = get_args()
 
@@ -104,3 +113,6 @@ if __name__ == '__main__':
 
     elif args.SCH == "ELG":
         gen_elg(args.f, args.BITS)
+
+    elif args.SCH == "MO":
+        gen_mo(args.f, args.BITS)
