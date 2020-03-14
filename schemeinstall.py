@@ -4,7 +4,7 @@ from sympy import nextprime, gcd, randprime, is_primitive_root
 from random import randint
 from util import auto_int
 
-
+# You can generate RSA params by hands, need gen p, q -- BITS-bit primes, n = p*q, d = utils.modinv(e, n)
 
 
 
