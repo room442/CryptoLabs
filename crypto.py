@@ -99,6 +99,11 @@ def MOdecrypt(c, k, p):
 
 
 def MOgetKeys(p):
-    e = randint(2, p - 1)
-    d = modinv(e, p - 1)
+    while True:
+        try:
+            e = randint(2, p - 1)
+            d = modinv(e, p - 1)
+        except:
+            continue
+        break
     return e, d
