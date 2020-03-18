@@ -2,7 +2,6 @@ import asn
 import crypto
 import argparse
 from params import *
-from util import load_module
 
 
 def parse_args():
