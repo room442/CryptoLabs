@@ -95,7 +95,8 @@ def MOencrypt(m, k, p):
 def MOdecrypt(c, k, p):
     return MOencrypt(c, k, p)
 
+
 def MOgetKeys(p):
-    e = randint(2, p-1)
-    d = modinv(e, p-1)
+    e = randint(2, p - 1)
+    d = modinv(e, p - 1)
     return e, d
