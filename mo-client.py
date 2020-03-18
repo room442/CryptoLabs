@@ -1,5 +1,5 @@
 import asyncio
-from crypto import MOencrypt, MOdecrypt, AES256encrypt
+from crypto import MOencrypt, MOdecrypt, AES256encrypt, MOgetKeys
 from random import randint
 from asn import MOencodeFinish, MOencodeParams, MOdecodeResponse
 from sympy import randprime
@@ -22,7 +22,8 @@ def get_data(connection):
     return data
 
 def sendfile(filename, p, ip, port):
-    a = randprime(2, p - 1)
+    e, d = MOgetKeys(p)
+
     with open(filename, "rb") as file:
         data = file.read()
 
@@ -35,12 +36,18 @@ def sendfile(filename, p, ip, port):
     client.connect((ip, port))
 
     integer_key = int.from_bytes(key, "big")
-    t_a = MOencrypt(integer_key, a, p)
+    while True:
+        try:
+            t_a = MOencrypt(integer_key, e, p)
+        except:
+            e, d = MOgetKeys(p)
+            continue
+        break
     client.send(MOencodeParams(p, p-1, t_a))
 
     msg = get_data(client)
     t_ab = MOdecodeResponse(msg)
-    t_b = MOdecrypt(t_ab, a, p)
+    t_b = MOdecrypt(t_ab, d, p)
 
     client.send(MOencodeFinish(t_b, datalen, encrypted))
 
