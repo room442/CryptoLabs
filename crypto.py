@@ -89,8 +89,9 @@ def ELGSignCheck(filename, a, b, p, r, w, s):
 
 
 def MOencrypt(m, k, p):
-    return pow(m, k, p)
+    return pow(m, k, p) % p
 
 
 def MOdecrypt(c, k, p):
     return pow(c, modinv(k, p), p)
+    return pow(c, modinv(k, p-1), p) %p
