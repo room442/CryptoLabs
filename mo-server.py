@@ -1,7 +1,7 @@
 import asyncio
 from random import randint
 from asn import MOdecodeParams, MOencodeResponse, MOdecodeFinish
-from crypto import MOencrypt, MOdecrypt, AES256decrypt, AES
+from crypto import MOencrypt, MOdecrypt, AES256decrypt, AES, MOgetKeys
 from sympy import randprime
 import socket
 
@@ -34,14 +34,21 @@ def server():
     msg = get_data(connection)
     p, r, t_a = MOdecodeParams(msg)
 
-    b = randprime(2, p - 1)
-    t_ab = MOencrypt(t_a, b, p)
+    e, d = MOgetKeys(p)
+
+    while True:
+        try:
+            t_ab = MOencrypt(t_a, e, p)
+        except:
+            e, d = MOgetKeys(p)
+            continue
+        break
     connection.send(MOencodeResponse(t_ab))
 
     msg = get_data(connection)
     t_b, len, encrypted = MOdecodeFinish(msg)
 
-    t = MOdecrypt(t_b, b, p)  # fixme: t != key
+    t = MOdecrypt(t_b, d, p)  # fixme: t != key
 
     opentext = AES256decrypt(encrypted,  hex(t)[2:])
 
