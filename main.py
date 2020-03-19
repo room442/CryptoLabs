@@ -2,7 +2,10 @@ import asn
 import crypto
 import argparse
 from params import *
-
+import mo_client
+import mo_server
+from multiprocessing import Process
+import time
 
 def parse_args():
     parser = argparse.ArgumentParser(description='RSA encoder and idgital signature generator')
@@ -28,6 +31,14 @@ def parse_args():
     parser.add_argument("-c", "--check",
                         action="store_true",
                         help="Check FILE signaruture, given by --sfile")
+
+    parser.add_argument("--server",
+                        action="store_true",
+                        help="Run as a server in MO scheme")
+
+    parser.add_argument("--client",
+                        action="store_true",
+                        help="Run as a client in MO scheme")
 
     parser.add_argument("--sfile",
                         help="Name of signature file")
@@ -139,9 +150,33 @@ def ELGfileCheckSignature(filename, sig_filename):
         s
     )
 
+def MO_three_pass(filename):
+    server = Process(target=mo_server.server, args=())
+    server.start()
+    time.sleep(0.1)
+    client = Process(target=mo_client.client, args=(filename, int(r,16)))
+
+    client.start()
+    server.join()
+    client.join()
+
+def MO_server():
+    mo_server.server()
+
+def MO_client(filename):
+    mo_client.client(filename, int(r, 16))
+
+
 if __name__ == '__main__':
     args = parse_args()
     try:
+        if args.SCH == "MO":
+            if args.server == True:
+                MO_server()
+            elif args.client == True:
+                MO_client(args.FILE)
+            else:
+                MO_three_pass(args.FILE)
         if args.encrypt:
             if args.SCH == "RSA":
                 RSAfileEncrypt(args.FILE)
