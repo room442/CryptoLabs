@@ -1,33 +1,62 @@
 import asyncio
 from random import randint
 from asn import MOdecodeParams, MOencodeResponse, MOdecodeFinish
-from crypto import MOencrypt, MOdecrypt, AES256decrypt
+from crypto import MOencrypt, MOdecrypt, AES256decrypt, AES, MOgetKeys
+from sympy import randprime
+import socket
+
+ip = "127.0.0.1"
+port = 8888
 
 
-async def handle_client(reader, writer):
-    p, r, t_a = MOdecodeParams(await reader.read())
-    b = randint(2, r - 1)
-    writer.write(MOencodeResponse(MOencrypt(t_a, b, p)))
-    t_b, len, encrypted = MOdecodeFinish(await reader.read())
-    t = MOdecrypt(t_b, b, p)
-    opentext = AES256decrypt(encrypted, t)
+def get_data(connection):
+    data = b""
+    while True:
+        newpart = connection.recv(1024)
+        if not newpart:
+            break
+        else:
+            data = data + newpart
+        if len(data) < 1024:
+            break
+    return data
+
+
+def server():
+    # Настраиваем сокет
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((ip, port))
+    server_socket.listen(10)
+
+    connection, address = server_socket.accept()
+    print(f"Connected: {address}")
+
+    msg = get_data(connection)
+    p, r, t_a = MOdecodeParams(msg)
+
+    e, d = MOgetKeys(p)
+
+    while True:
+        try:
+            t_ab = MOencrypt(t_a, e, p)
+        except:
+            e, d = MOgetKeys(p)
+            continue
+        break
+    connection.send(MOencodeResponse(t_ab))
+
+    msg = get_data(connection)
+    t_b, len, encrypted = MOdecodeFinish(msg)
+
+    t = MOdecrypt(t_b, d, p)  # fixme: t != key
+
+    opentext = AES256decrypt(encrypted, int.to_bytes(t, AES.key_size[-1], "big"))
+
     print(opentext)
+    connection.close()
 
-    writer.close()
 
+# Слушаем запросы
 
-loop = asyncio.get_event_loop()
-coro = asyncio.start_server(handle_client, '127.0.0.1', 8888, loop=loop)
-server = loop.run_until_complete(coro)
-
-# Serve requests until Ctrl+C is pressed
-print('Serving on {}'.format(server.sockets[0].getsockname()))
-try:
-    loop.run_forever()
-except KeyboardInterrupt:
-    pass
-
-# Close the server
-server.close()
-loop.run_until_complete(server.wait_closed())
-loop.close()
+if __name__ == '__main__':
+    server()

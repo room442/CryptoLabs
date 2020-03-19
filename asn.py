@@ -178,7 +178,7 @@ def MOencodeParams(  # A --(params, t_a)-> B
     encoder.enter(asn1.Numbers.Set)  # 2 -- set of keys
     encoder.enter(asn1.Numbers.Sequence)  # 3 -- sequence of first key
 
-    encoder.write(b'\x08\x07\x02\x00', asn1.Numbers.OctetString)  # TODO: check if it works correctly
+    encoder.write(b'\x08\x07\x02\x00', asn1.Numbers.OctetString)
     encoder.write(b'MO params and t^a', asn1.Numbers.UTF8String)
 
     encoder.enter(asn1.Numbers.Sequence)  # 4 -- sequence of open key
@@ -214,7 +214,7 @@ def MOencodeResponse(  # A <--(t_ab)-- B
     encoder.enter(asn1.Numbers.Set)
     encoder.enter(asn1.Numbers.Sequence)
 
-    encoder.write(b'\x08\x07\x02\x00', asn1.Numbers.OctetString)  # TODO: check if it works correctly
+    encoder.write(b'\x08\x07\x02\x00', asn1.Numbers.OctetString)
     encoder.write("MO t^(ab) response")
 
     encoder.enter(asn1.Numbers.Sequence)
@@ -250,7 +250,7 @@ def MOencodeFinish(  # A --(t_b, cipher_params)-> B
     encoder.enter(asn1.Numbers.Set)
     encoder.enter(asn1.Numbers.Sequence)
 
-    encoder.write(b'\x08\x07\x02\x00', asn1.Numbers.OctetString)  # TODO: check if it works correctly
+    encoder.write(b'\x08\x07\x02\x00', asn1.Numbers.OctetString)
     encoder.write("MO t^b and first message")
 
     encoder.enter(asn1.Numbers.Sequence)
