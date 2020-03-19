@@ -27,8 +27,8 @@ def sendfile(filename, p, ip, port):
     with open(filename, "rb") as file:
         data = file.read()
 
-    datalen = len(data)
     encrypted, key = AES256encrypt(data)
+    datalen = len(encrypted)
 
     print(key)
 

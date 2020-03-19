@@ -50,7 +50,7 @@ def server():
 
     t = MOdecrypt(t_b, d, p)  # fixme: t != key
 
-    opentext = AES256decrypt(encrypted,  hex(t)[2:])
+    opentext = AES256decrypt(encrypted, int.to_bytes(t, AES.key_size[-1], "big"))
 
     print(opentext)
     connection.close()
