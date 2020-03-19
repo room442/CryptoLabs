@@ -1,6 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
 *.txt
-venv/
+venv*
 venv_sagepy/
 .idea/
 __pycache__/
