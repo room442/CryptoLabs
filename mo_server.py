@@ -57,10 +57,10 @@ def server():
         connection.close()
 
         try:
-            os.mkdir("received")
+            os.mkdir("MO/received")
         except:
             pass
-        with open(F"received/MOreceived {address}.dec", "wb") as file:
+        with open(F"MO/received/MOreceived {address}.dec", "wb") as file:
             file.write(opentext)
             print(F"get new opentext: {opentext}")
             file.close()
