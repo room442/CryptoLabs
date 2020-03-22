@@ -1,12 +1,10 @@
-import asyncio
-from crypto import MOencrypt, MOdecrypt, AES256encrypt, MOgetKeys
-from random import randint
-from asn import MOencodeFinish, MOencodeParams, MOdecodeResponse
-from sympy import randprime
-
+from MO.crypto import MOencrypt, MOdecrypt, MOgetKeys
+from aes_common import AES256encrypt
+from MO.asn import MOencodeFinish, MOencodeParams, MOdecodeResponse
 import socket
 
-
+ip = "127.0.0.1"
+port = 8888
 
 
 def get_data(connection):
@@ -21,6 +19,7 @@ def get_data(connection):
             break
     return data
 
+
 def sendfile(filename, p, ip, port):
     e, d = MOgetKeys(p)
 
@@ -29,8 +28,6 @@ def sendfile(filename, p, ip, port):
 
     encrypted, key = AES256encrypt(data)
     datalen = len(encrypted)
-
-    print(key)
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((ip, port))
@@ -43,7 +40,7 @@ def sendfile(filename, p, ip, port):
             e, d = MOgetKeys(p)
             continue
         break
-    client.send(MOencodeParams(p, p-1, t_a))
+    client.send(MOencodeParams(p, p - 1, t_a))
 
     msg = get_data(client)
     t_ab = MOdecodeResponse(msg)
@@ -51,10 +48,6 @@ def sendfile(filename, p, ip, port):
 
     client.send(MOencodeFinish(t_b, datalen, encrypted))
 
-    print("debug")
 
-
-if __name__ == '__main__':
-    from params import *
-
-    sendfile("opentext.txt", int(r, 16), "127.0.0.1", 8888)
+def client(filename, p):
+    sendfile(filename, p, ip, port)

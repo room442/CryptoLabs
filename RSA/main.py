@@ -1,17 +1,14 @@
-import asn
-import crypto
+from RSA.asn import RSAdecode, RSAdecodeSign, RSAencode, RSAencodeSign
+from RSA.crypto import RSAsignCheck, RSAsignAdd, RSAdecrypt, RSAencrypt
+import aes_common
 import argparse
-from params import *
+from RSA.params import *
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='RSA encoder and idgital signature generator')
     parser.add_argument("FILE",
                         help="Name of input file")
-
-    parser.add_argument("SCH",
-                        type=str,
-                        help="Scheme RSA|ELG, ELG supports only sign")
 
     parser.add_argument("-e", "--encrypt",
                         action="store_true",
@@ -38,9 +35,9 @@ def parse_args():
 def RSAfileEncrypt(filename):
     with open(filename, "rb") as file:
         data = file.read()
-        encrypted, key = crypto.AES256encrypt(data)
+        encrypted, key = aes_common.AES256encrypt(data)
 
-    encrypted_key = crypto.RSAencrypt(
+    encrypted_key = RSAencrypt(
         int.from_bytes(key, "big"),
         int(exp, 16),
         int(n, 16)
@@ -50,7 +47,7 @@ def RSAfileEncrypt(filename):
     print("d = ", d)
     print("n = ", n)
 
-    encoded = asn.RSAencode(
+    encoded = RSAencode(
         int(n, 16),
         int(exp, 16),
         encrypted_key,
@@ -63,21 +60,21 @@ def RSAfileEncrypt(filename):
 
 
 def RSAfileDecrypt(filename):
-    n, e, encrypted_key, encrypted = asn.RSAdecode(filename)
+    n, e, encrypted_key, encrypted = RSAdecode(filename)
 
     print("e = ", e)
     print("d = ", d)
     print("n = ", n)
 
-    key = crypto.RSAdecrypt(
+    key = RSAdecrypt(
         encrypted_key,
         int(d, 16),
         n
     )
 
-    key = key.to_bytes(crypto.AES.key_size[-1], "big")
+    key = key.to_bytes(aes_common.AES.key_size[-1], "big")
 
-    decrypted = crypto.AES256decrypt(encrypted, key)
+    decrypted = aes_common.AES256decrypt(encrypted, key)
 
     with open(filename + ".dec", "wb") as file:
         file.write(decrypted)
@@ -86,91 +83,46 @@ def RSAfileDecrypt(filename):
 def RSAfileSign(filename):
     with open(filename + ".sign", "wb") as file:
         file.write(
-            asn.RSAencodeSign(
+            RSAencodeSign(
                 int(sign_n, 16),
                 int(sign_d, 16),
-                crypto.RSAsignAdd(filename,
-                                  int(sign_d, 16),
-                                  int(sign_n, 16)
-                                  )
+                RSAsignAdd(filename,
+                                      int(sign_d, 16),
+                                      int(sign_n, 16)
+                                      )
             )
         )
 
 
 def RSAfileCheckSignature(filename, sig_filename):
-    n, sign = asn.RSAdecodeSign(sig_filename)
-    return crypto.RSAsignCheck(
+    n, sign = RSAdecodeSign(sig_filename)
+    return RSAsignCheck(
         filename,
         int(exp, 16),
         n,
         sign
     )
 
-def ELGfileSign(filename):
-    w, s = crypto.ELGSignAdd(
-        filename,
-        int(x, 16),
-        int(a, 16),
-        int(p, 16),
-        int(r, 16)
-    )
-    with open(filename + ".sign", "wb") as file:
-        file.write(
-            asn.ELGencodeSign(
-                int(p, 16),
-                int(r, 16),
-                int(a, 16),
-                w,
-                s,
-                int(b, 16)
-            )
-        )
-
-def ELGfileCheckSignature(filename, sig_filename):
-    b, p, r, a, w, s = asn.ELGdecodeSign(sig_filename)
-
-    return crypto.ELGSignCheck(
-        filename,
-        a,
-        b,
-        p,
-        r,
-        w,
-        s
-    )
 
 if __name__ == '__main__':
     args = parse_args()
     try:
         if args.encrypt:
-            if args.SCH == "RSA":
-                RSAfileEncrypt(args.FILE)
-                print("Ecryption complete")
-            else:
-                print("Wrong SCH")
+            RSAfileEncrypt(args.FILE)
 
         if args.decrypt:
-            if args.SCH == "RSA":
-                RSAfileDecrypt(args.FILE)
-                print("Decryption complete")
-            else:
-                print("Wrong SCH")
+            RSAfileDecrypt(args.FILE)
+            print("Decryption complete")
 
         if args.sign:
-            if args.SCH == "RSA":
-                RSAfileSign(args.FILE)
-            elif args.SCH == "ELG":
-                ELGfileSign(args.FILE)
+            RSAfileSign(args.FILE)
             print("Signing complete")
 
         if args.check:
             if args.sfile is None:
                 print("You should give the signature file by --sfile command")
                 exit(1)
-            if args.SCH == "RSA":
-                result = RSAfileCheckSignature(args.FILE, args.sfile)
-            elif args.SCH == "ELG":
-                result = ELGfileCheckSignature(args.FILE, args.sfile)
-            print("Sign check: " + str(result))
+            result = RSAfileCheckSignature(args.FILE, args.sfile)
+            print(F"Sign check result: {result}")
     except NameError:
         print("Error with names of varaibles, please, check params.py or re-generete it with schemeinstall.py")
