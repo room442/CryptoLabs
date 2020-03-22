@@ -123,5 +123,6 @@ if __name__ == '__main__':
                 print("You should give the signature file by --sfile command")
                 exit(1)
             result = RSAfileCheckSignature(args.FILE, args.sfile)
+            print(F"Sign check result: {result}")
     except NameError:
         print("Error with names of varaibles, please, check params.py or re-generete it with schemeinstall.py")
