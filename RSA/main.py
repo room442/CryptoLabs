@@ -1,4 +1,5 @@
-import asn_common
+from RSA.asn import RSAdecode, RSAdecodeSign, RSAencode, RSAencodeSign
+from RSA.crypto import RSAsignCheck, RSAsignAdd, RSAdecrypt, RSAencrypt
 import aes_common
 import argparse
 from RSA.params import *
@@ -36,7 +37,7 @@ def RSAfileEncrypt(filename):
         data = file.read()
         encrypted, key = aes_common.AES256encrypt(data)
 
-    encrypted_key = aes_common.RSAencrypt(
+    encrypted_key = RSAencrypt(
         int.from_bytes(key, "big"),
         int(exp, 16),
         int(n, 16)
@@ -46,7 +47,7 @@ def RSAfileEncrypt(filename):
     print("d = ", d)
     print("n = ", n)
 
-    encoded = asn_common.RSAencode(
+    encoded = RSAencode(
         int(n, 16),
         int(exp, 16),
         encrypted_key,
@@ -59,13 +60,13 @@ def RSAfileEncrypt(filename):
 
 
 def RSAfileDecrypt(filename):
-    n, e, encrypted_key, encrypted = asn_common.RSAdecode(filename)
+    n, e, encrypted_key, encrypted = RSAdecode(filename)
 
     print("e = ", e)
     print("d = ", d)
     print("n = ", n)
 
-    key = aes_common.RSAdecrypt(
+    key = RSAdecrypt(
         encrypted_key,
         int(d, 16),
         n
@@ -82,10 +83,10 @@ def RSAfileDecrypt(filename):
 def RSAfileSign(filename):
     with open(filename + ".sign", "wb") as file:
         file.write(
-            asn_common.RSAencodeSign(
+            RSAencodeSign(
                 int(sign_n, 16),
                 int(sign_d, 16),
-                aes_common.RSAsignAdd(filename,
+                RSAsignAdd(filename,
                                       int(sign_d, 16),
                                       int(sign_n, 16)
                                       )
@@ -94,8 +95,8 @@ def RSAfileSign(filename):
 
 
 def RSAfileCheckSignature(filename, sig_filename):
-    n, sign = asn_common.RSAdecodeSign(sig_filename)
-    return aes_common.RSAsignCheck(
+    n, sign = RSAdecodeSign(sig_filename)
+    return RSAsignCheck(
         filename,
         int(exp, 16),
         n,
