@@ -57,10 +57,8 @@ def server():
             os.mkdir("received")
         except:
             pass
-        with open(F"MO/received/MOreceived {address}.dec", "wb") as file:
+        with open(F"received/{address}.dec", "wb") as file:
             file.write(opentext)
-            print(F"get new opentext: {opentext}")
-            file.close()
 
         # time.sleep(1)
 
