@@ -1,19 +1,13 @@
 import asn_common
 import aes_common
 import argparse
-from params import *
-from MO import mo_client, mo_server
-from multiprocessing import Process
-import time
+from RSA.params import *
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='RSA encoder and idgital signature generator')
     parser.add_argument("FILE",
                         help="Name of input file")
-
-    parser.add_argument("SCH",
-                        type=str,
-                        help="Scheme RSA|ELG, ELG supports only sign")
 
     parser.add_argument("-e", "--encrypt",
                         action="store_true",
@@ -30,14 +24,6 @@ def parse_args():
     parser.add_argument("-c", "--check",
                         action="store_true",
                         help="Check FILE signaruture, given by --sfile")
-
-    parser.add_argument("--server",
-                        action="store_true",
-                        help="Run as a server in MO scheme")
-
-    parser.add_argument("--client",
-                        action="store_true",
-                        help="Run as a client in MO scheme")
 
     parser.add_argument("--sfile",
                         help="Name of signature file")
@@ -116,95 +102,25 @@ def RSAfileCheckSignature(filename, sig_filename):
         sign
     )
 
-def ELGfileSign(filename):
-    w, s = aes_common.ELGSignAdd(
-        filename,
-        int(x, 16),
-        int(a, 16),
-        int(p, 16),
-        int(r, 16)
-    )
-    with open(filename + ".sign", "wb") as file:
-        file.write(
-            asn_common.ELGencodeSign(
-                int(p, 16),
-                int(r, 16),
-                int(a, 16),
-                w,
-                s,
-                int(b, 16)
-            )
-        )
-
-def ELGfileCheckSignature(filename, sig_filename):
-    b, p, r, a, w, s = asn_common.ELGdecodeSign(sig_filename)
-
-    return aes_common.ELGSignCheck(
-        filename,
-        a,
-        b,
-        p,
-        r,
-        w,
-        s
-    )
-
-def MO_three_pass(filename):
-    server = Process(target=mo_server.server, args=())
-    server.start()
-    time.sleep(0.1)
-    client = Process(target=mo_client.client, args=(filename, int(r, 16)))
-
-    client.start()
-    server.join()
-    client.join()
-
-def MO_server():
-    mo_server.server()
-
-def MO_client(filename):
-    mo_client.client(filename, int(r, 16))
-
 
 if __name__ == '__main__':
     args = parse_args()
     try:
-        if args.SCH == "MO":
-            if args.server == True:
-                MO_server()
-            elif args.client == True:
-                MO_client(args.FILE)
-            else:
-                MO_three_pass(args.FILE)
         if args.encrypt:
-            if args.SCH == "RSA":
-                RSAfileEncrypt(args.FILE)
-                print("Ecryption complete")
-            else:
-                print("Wrong SCH")
+            RSAfileEncrypt(args.FILE)
 
         if args.decrypt:
-            if args.SCH == "RSA":
-                RSAfileDecrypt(args.FILE)
-                print("Decryption complete")
-            else:
-                print("Wrong SCH")
+            RSAfileDecrypt(args.FILE)
+            print("Decryption complete")
 
         if args.sign:
-            if args.SCH == "RSA":
-                RSAfileSign(args.FILE)
-            elif args.SCH == "ELG":
-                ELGfileSign(args.FILE)
+            RSAfileSign(args.FILE)
             print("Signing complete")
 
         if args.check:
             if args.sfile is None:
                 print("You should give the signature file by --sfile command")
                 exit(1)
-            if args.SCH == "RSA":
-                result = RSAfileCheckSignature(args.FILE, args.sfile)
-            elif args.SCH == "ELG":
-                result = ELGfileCheckSignature(args.FILE, args.sfile)
-            print("Sign check: " + str(result))
+            result = RSAfileCheckSignature(args.FILE, args.sfile)
     except NameError:
         print("Error with names of varaibles, please, check params.py or re-generete it with schemeinstall.py")
