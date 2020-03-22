@@ -1,5 +1,6 @@
 import argparse
 import rsa  # for keys
+from util import auto_int
 
 
 def get_args():
