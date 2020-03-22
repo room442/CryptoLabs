@@ -1,7 +1,7 @@
 import asyncio
 from random import randint
-from asn_common import MOdecodeParams, MOencodeResponse, MOdecodeFinish
-from aes_common import MOencrypt, MOdecrypt, AES256decrypt, AES, MOgetKeys
+from .asn import MOdecodeParams, MOencodeResponse, MOdecodeFinish
+from aes_common import AES256decrypt, AES
 from sympy import randprime
 import socket
 import time
