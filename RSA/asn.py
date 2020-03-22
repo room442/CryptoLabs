@@ -1,5 +1,5 @@
 import asn1
-from asn import parse
+from asn_common import parse
 
 def RSAencode(
         n,

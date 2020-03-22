@@ -1,9 +1,8 @@
-import asn
-import crypto
+import asn_common
+import aes_common
 import argparse
 from params import *
-import mo_client
-import mo_server
+from MO import mo_client, mo_server
 from multiprocessing import Process
 import time
 
@@ -49,9 +48,9 @@ def parse_args():
 def RSAfileEncrypt(filename):
     with open(filename, "rb") as file:
         data = file.read()
-        encrypted, key = crypto.AES256encrypt(data)
+        encrypted, key = aes_common.AES256encrypt(data)
 
-    encrypted_key = crypto.RSAencrypt(
+    encrypted_key = aes_common.RSAencrypt(
         int.from_bytes(key, "big"),
         int(exp, 16),
         int(n, 16)
@@ -61,7 +60,7 @@ def RSAfileEncrypt(filename):
     print("d = ", d)
     print("n = ", n)
 
-    encoded = asn.RSAencode(
+    encoded = asn_common.RSAencode(
         int(n, 16),
         int(exp, 16),
         encrypted_key,
@@ -74,21 +73,21 @@ def RSAfileEncrypt(filename):
 
 
 def RSAfileDecrypt(filename):
-    n, e, encrypted_key, encrypted = asn.RSAdecode(filename)
+    n, e, encrypted_key, encrypted = asn_common.RSAdecode(filename)
 
     print("e = ", e)
     print("d = ", d)
     print("n = ", n)
 
-    key = crypto.RSAdecrypt(
+    key = aes_common.RSAdecrypt(
         encrypted_key,
         int(d, 16),
         n
     )
 
-    key = key.to_bytes(crypto.AES.key_size[-1], "big")
+    key = key.to_bytes(aes_common.AES.key_size[-1], "big")
 
-    decrypted = crypto.AES256decrypt(encrypted, key)
+    decrypted = aes_common.AES256decrypt(encrypted, key)
 
     with open(filename + ".dec", "wb") as file:
         file.write(decrypted)
@@ -97,20 +96,20 @@ def RSAfileDecrypt(filename):
 def RSAfileSign(filename):
     with open(filename + ".sign", "wb") as file:
         file.write(
-            asn.RSAencodeSign(
+            asn_common.RSAencodeSign(
                 int(sign_n, 16),
                 int(sign_d, 16),
-                crypto.RSAsignAdd(filename,
-                                  int(sign_d, 16),
-                                  int(sign_n, 16)
-                                  )
+                aes_common.RSAsignAdd(filename,
+                                      int(sign_d, 16),
+                                      int(sign_n, 16)
+                                      )
             )
         )
 
 
 def RSAfileCheckSignature(filename, sig_filename):
-    n, sign = asn.RSAdecodeSign(sig_filename)
-    return crypto.RSAsignCheck(
+    n, sign = asn_common.RSAdecodeSign(sig_filename)
+    return aes_common.RSAsignCheck(
         filename,
         int(exp, 16),
         n,
@@ -118,7 +117,7 @@ def RSAfileCheckSignature(filename, sig_filename):
     )
 
 def ELGfileSign(filename):
-    w, s = crypto.ELGSignAdd(
+    w, s = aes_common.ELGSignAdd(
         filename,
         int(x, 16),
         int(a, 16),
@@ -127,7 +126,7 @@ def ELGfileSign(filename):
     )
     with open(filename + ".sign", "wb") as file:
         file.write(
-            asn.ELGencodeSign(
+            asn_common.ELGencodeSign(
                 int(p, 16),
                 int(r, 16),
                 int(a, 16),
@@ -138,9 +137,9 @@ def ELGfileSign(filename):
         )
 
 def ELGfileCheckSignature(filename, sig_filename):
-    b, p, r, a, w, s = asn.ELGdecodeSign(sig_filename)
+    b, p, r, a, w, s = asn_common.ELGdecodeSign(sig_filename)
 
-    return crypto.ELGSignCheck(
+    return aes_common.ELGSignCheck(
         filename,
         a,
         b,
@@ -154,7 +153,7 @@ def MO_three_pass(filename):
     server = Process(target=mo_server.server, args=())
     server.start()
     time.sleep(0.1)
-    client = Process(target=mo_client.client, args=(filename, int(r,16)))
+    client = Process(target=mo_client.client, args=(filename, int(r, 16)))
 
     client.start()
     server.join()
