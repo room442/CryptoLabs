@@ -1,10 +1,7 @@
-import asyncio
-from random import randint
-from asn import MOdecodeParams, MOencodeResponse, MOdecodeFinish
-from crypto import MOencrypt, MOdecrypt, AES256decrypt, AES, MOgetKeys
-from sympy import randprime
+from MO.asn import MOdecodeParams, MOencodeResponse, MOdecodeFinish
+from MO.crypto import MOencrypt, MOdecrypt, MOgetKeys
+from aes_common import AES256decrypt, AES
 import socket
-import time
 import os
 
 ip = "127.0.0.1"
@@ -60,10 +57,8 @@ def server():
             os.mkdir("received")
         except:
             pass
-        with open(F"received/MOreceived {address}.dec", "wb") as file:
+        with open(F"received/{address}.dec", "wb") as file:
             file.write(opentext)
-            print(F"get new opentext: {opentext}")
-            file.close()
 
         # time.sleep(1)
 

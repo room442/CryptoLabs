@@ -1,9 +1,6 @@
-import asyncio
-from crypto import MOencrypt, MOdecrypt, AES256encrypt, MOgetKeys
-from random import randint
-from asn import MOencodeFinish, MOencodeParams, MOdecodeResponse
-from sympy import randprime
-
+from MO.crypto import MOencrypt, MOdecrypt, MOgetKeys
+from aes_common import AES256encrypt
+from MO.asn import MOencodeFinish, MOencodeParams, MOdecodeResponse
 import socket
 
 ip = "127.0.0.1"
@@ -31,7 +28,6 @@ def sendfile(filename, p, ip, port):
 
     encrypted, key = AES256encrypt(data)
     datalen = len(encrypted)
-
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((ip, port))
