@@ -24,24 +24,21 @@ def gen_rsa(filename, bits):
     signpubkey, signprivkey = rsa.newkeys(1024, exponent=exp)
 
     try:
-        mystr = "exp = \"" + str(hex(exp)[2:]) + "\"" + "\n" \
-                                                        "n = \"" + str(hex(pubkey.n))[2:] + "\"" + "\n" \
-                                                                                                   "d = \"" + str(
-            hex(privkey.d))[2:] + "\"" + "\n" \
-                                         "p = \"" + str(hex(privkey.p))[2:] + "\"" + "\n" \
-                                                                                     "q = \"" + str(hex(privkey.q))[
-                                                                                                2:] + "\"" + "\n" \
-                                                                                                             "sign_n = \"" + str(
-            hex(signpubkey.n))[2:] + "\"" + "\n" \
-                                            "sign_d = \"" + str(hex(signprivkey.d))[2:] + "\""
+        mystr = F"exp = \"{hex(exp)[2:]} \"\n" \
+                F"n = \"{hex(pubkey.n)[2:]}\"\n"\
+                F"d = \"{hex(privkey.d)[2:]}\"\n"\
+                F"p = \"{hex(privkey.p)[2:]}\"\n"\
+                F"q = \"{hex(privkey.q)[2:]}\"\n"\
+                F"sign_n = \"{hex(signpubkey.n)[2:]}\"\n"\
+                F"sign_d = \"{hex(signprivkey.d)[2:]} \""
         with open(filename, "w") as file:
             file.write(mystr)
     except:
-        print("exp = \"" + str(hex(exp)[2:]) + "\"")
-        print("n = \"" + str(hex(pubkey.n))[2:] + "\"")
-        print("d = \"" + str(hex(privkey.d))[2:] + "\"")
-        print("p = \"" + str(hex(privkey.p))[2:] + "\"")
-        print("q = \"" + str(hex(privkey.q))[2:] + "\"")
+        print(F"exp = \"{hex(exp)[2:]}\"")
+        print(F"n = \"{hex(pubkey.n)[2:]}\"")
+        print(F"d = \"{hex(privkey.d)[2:]}\"")
+        print(F"p = \"{hex(privkey.p)[2:]}\"")
+        print(F"q = \"{hex(privkey.q)[2:]}\"")
 
 
 if __name__ == '__main__':

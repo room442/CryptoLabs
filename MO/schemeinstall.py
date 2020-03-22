@@ -21,11 +21,11 @@ def get_args():
 def gen_mo(filename, bits):
     r = randprime(2 ** bits, 2 ** (bits + 1))
     try:
-        mystr = "r = \"" + str(hex(r)[2:]) + "\""
+        mystr = F"r = \"{hex(r)[2:]}\""
         with open(filename, "w") as file:
             file.write(mystr)
     except:
-        print("r = \"" + str(hex(r)[2:]) + "\"")
+        print(F"r = \"{hex(r)[2:]}\"")
 
 
 if __name__ == '__main__':

@@ -47,21 +47,19 @@ def gen_elg(filename, bits):
     b = gen_b(a, x, p)
 
     try:
-        mystr = "p = \"" + str(hex(p)[2:]) + "\"" + "\n" \
-                                                    "a = \"" + str(hex(a))[2:] + "\"" + "\n" \
-                                                                                        "x = \"" + str(hex(x))[
-                                                                                                   2:] + "\"" + "\n" \
-                                                                                                                "b = \"" + str(
-            hex(b))[2:] + "\"" + "\n" \
-                                 "r = \"" + str(hex(r))[2:] + "\"" + "\n"
+        mystr = F"p = \"{hex(p)[2:]}\"\n" \
+                F"a = \"{hex(a)[2:]}\"\n" \
+                F"x = \"{hex(x)[2:]}\"\n" \
+                F"b = \"{hex(b)[2:]}\"\n" \
+                F"r = \"{hex(r)[2:]}\"\n"
         with open(filename, "w") as file:
             file.write(mystr)
     except:
-        print("p= \"" + str(hex(p)[2:]) + "\"")
-        print("a = \"" + str(hex(a))[2:] + "\"")
-        print("x = \"" + str(hex(x))[2:] + "\"")
-        print("b = \"" + str(hex(b))[2:] + "\"")
-        print("r = \"" + str(hex(r))[2:] + "\"")
+        print(F"p = \"{hex(p)[2:]}\"")
+        print(F"a = \"{hex(a)[2:]}\"")
+        print(F"x = \"{hex(x)[2:]}\"")
+        print(F"b = \"{hex(b)[2:]}\"")
+        print(F"r = \"{hex(r)[2:]}\"")
 
 
 if __name__ == '__main__':
