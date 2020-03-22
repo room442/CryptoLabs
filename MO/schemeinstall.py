@@ -30,4 +30,4 @@ def gen_mo(filename, bits):
 
 if __name__ == '__main__':
     args = get_args()
-    gen_elg(args.f, args.BITS)
+    gen_mo(args.f, args.BITS)
