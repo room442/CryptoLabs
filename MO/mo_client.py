@@ -1,9 +1,6 @@
-import asyncio
-from .crypto import MOencrypt, MOdecrypt, MOgetKeys
+from MO.crypto import MOencrypt, MOdecrypt, MOgetKeys
 from aes_common import AES256encrypt
-from random import randint
-from .asn import MOencodeFinish, MOencodeParams, MOdecodeResponse
-from sympy import randprime
+from MO.asn import MOencodeFinish, MOencodeParams, MOdecodeResponse
 
 import socket
 

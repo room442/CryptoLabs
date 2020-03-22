@@ -1,4 +1,3 @@
-
 from hashlib import sha256
 from random import randint
 from util import modinv
