@@ -25,7 +25,7 @@ def gen_rsa(filename, bits):
     signpubkey, signprivkey = rsa.newkeys(1024, exponent=exp)
 
     try:
-        mystr = F"exp = \"{hex(exp)[2:]} \"\n" \
+        mystr = F"exp = \"{hex(exp)[2:]}\"\n" \
                 F"n = \"{hex(pubkey.n)[2:]}\"\n"\
                 F"d = \"{hex(privkey.d)[2:]}\"\n"\
                 F"p = \"{hex(privkey.p)[2:]}\"\n"\
