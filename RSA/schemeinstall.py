@@ -70,7 +70,7 @@ def gen_rsa_wiener_vuln(filename, bits):
         break
     n = int(n)
     try:
-        mystr = F"e = \"{hex(e)[2:]} \"\n" \
+        mystr = F"e = \"{hex(e)[2:]}\"\n" \
                 F"n = \"{hex(n)[2:]}\"\n" \
                 F"d = \"{hex(d)[2:]}\"\n" \
                 F"p = \"{hex(p)[2:]}\"\n" \
@@ -78,6 +78,7 @@ def gen_rsa_wiener_vuln(filename, bits):
                 F"sign_n = \"{hex(n)[2:]}\"\n" \
                 F"sign_d = \"{hex(d)[2:]} \""
         with open(filename, "w") as file:
+            file.write("This file should always be in place\n")
             file.write(mystr)
     except:
         print(F"e = \"{hex(e)[2:]}\"")
