@@ -36,7 +36,7 @@ def gen_rsa(filename, bits):
     signpubkey, signprivkey = rsa.newkeys(1024, exponent=exp)
 
     try:
-        mystr = F"exp = \"{hex(exp)[2:]} \"\n" \
+        mystr = F"e = \"{hex(exp)[2:]} \"\n" \
                 F"n = \"{hex(pubkey.n)[2:]}\"\n" \
                 F"d = \"{hex(privkey.d)[2:]}\"\n" \
                 F"p = \"{hex(privkey.p)[2:]}\"\n" \
@@ -46,7 +46,7 @@ def gen_rsa(filename, bits):
         with open(filename, "w") as file:
             file.write(mystr)
     except:
-        print(F"exp = \"{hex(exp)[2:]}\"")
+        print(F"e = \"{hex(exp)[2:]}\"")
         print(F"n = \"{hex(pubkey.n)[2:]}\"")
         print(F"d = \"{hex(privkey.d)[2:]}\"")
         print(F"p = \"{hex(privkey.p)[2:]}\"")
@@ -60,7 +60,7 @@ def gen_rsa_wiener_vuln(filename, bits):
     d = randint(0x10001, (1 / 3) * pow(n, 0.25))
     e = modinv(d, (p - 1) * (q - 1))
     try:
-        mystr = F"exp = \"{hex(e)[2:]} \"\n" \
+        mystr = F"e = \"{hex(e)[2:]} \"\n" \
                 F"n = \"{hex(n)[2:]}\"\n" \
                 F"d = \"{hex(d)[2:]}\"\n" \
                 F"p = \"{hex(p)[2:]}\"\n" \
@@ -70,7 +70,7 @@ def gen_rsa_wiener_vuln(filename, bits):
         with open(filename, "w") as file:
             file.write(mystr)
     except:
-        print(F"exp = \"{hex(e)[2:]}\"")
+        print(F"e = \"{hex(e)[2:]}\"")
         print(F"n = \"{hex(n)[2:]}\"")
         print(F"d = \"{hex(d)[2:]}\"")
         print(F"p = \"{hex(p)[2:]}\"")
