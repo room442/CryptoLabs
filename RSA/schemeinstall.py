@@ -25,7 +25,7 @@ def get_args():
 
     parser.add_argument("--wiener",
                         action="store_true",
-                        help="Generate wiener-attack immune params")
+                        help="Generate wiener-attack unimmune params")
 
     return parser.parse_args()
 
