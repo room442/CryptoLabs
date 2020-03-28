@@ -1,17 +1,25 @@
 import math
+from decimal import getcontext, Decimal
 
 
-def contFrac(x, k=3):
-    cf = []
-    q = math.floor(x)
-    cf.append(q)
-    x = x - q
-    i = 0
-    while x != 0 and i < k:
-        q = math.floor(1 / x)
-        cf.append(q)
-        x = 1 / x - q
-        i = i + 1
+def contFrac(a, b, k=3):
+
+    eps = 300
+    getcontext().prec = eps
+
+    x = Decimal(a)/Decimal(b)
+    cf = [int(x)]
+    x = x - int(x)
+
+    for i in range(k):
+        a_i = int(Decimal(1)/x)
+        x = (Decimal(1)/x) - a_i
+
+        cf.append(a_i)
+
+        if x < Decimal(1)/Decimal(10 ** (eps / 2)):
+            break
+
     return cf
 
 def getPQ(i, frac):
