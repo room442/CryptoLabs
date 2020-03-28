@@ -3,18 +3,23 @@ from util import auto_int
 from frac import contFrac, getPQ
 import argparse
 from RSA.crypto import RSAencrypt
+from RSA.wiener_vuln import *
 
 
 def get_args():
     parser = argparse.ArgumentParser(description='Wiener attack')
 
-    parser.add_argument("n",
+    parser.add_argument("-n",
                         type=auto_int,
                         help="Big number, such as n = pq, where p,q is primes")
 
-    parser.add_argument("e",
+    parser.add_argument("-e",
                         type=auto_int,
                         help="Open key")
+
+    parser.add_argument("--file",
+                        action="store_true",
+                        help="Use wiener_vuln.py for params")
 
     return parser.parse_args()
 
@@ -30,4 +35,7 @@ def attack(n, e, m):
 
 if __name__ == '__main__':
     args = get_args()
-    print(attack(args.n, args.e, 0x111111))
+    if args.file:
+        attack(n, e, 0x111111)
+    else:
+        print(attack(args.n, args.e, 0x111111))
