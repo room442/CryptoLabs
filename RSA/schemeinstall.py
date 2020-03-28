@@ -7,6 +7,33 @@ from math import sqrt
 from decimal import Decimal
 
 
+def _print_params(filename, e, n, d, p, q, nn, dd):
+    try:
+        mystr = F"e = \"{hex(e)[2:]}\"\n" \
+                F"n = \"{hex(n)[2:]}\"\n" \
+                F"d = \"{hex(d)[2:]}\"\n" \
+                F"p = \"{hex(p)[2:]}\"\n" \
+                F"q = \"{hex(q)[2:]}\"\n" \
+                F"sign_n = \"{hex(nn)[2:]}\"\n" \
+                F"sign_d = \"{hex(dd)[2:]} \""
+        with open(filename, "w") as file:
+            file.write("This file should always be in place\n")
+            file.write(mystr)
+    except:
+        print(F"e = \"{hex(e)[2:]}\"")
+        print(F"n = \"{hex(n)[2:]}\"")
+        print(F"d = \"{hex(d)[2:]}\"")
+        print(F"p = \"{hex(p)[2:]}\"")
+        print(F"q = \"{hex(q)[2:]}\"")
+
+def _getNPQ(bits):
+    p = randprime(2 ** ((bits // 2) - 1), 2 ** (bits // 2))
+    q = randprime(2 ** ((bits // 2) - 1), 2 ** (bits // 2))
+    p, q = max(p, q), min(p, q)
+    n = p * q
+    return n, p, q
+
+
 def get_args():
     parser = argparse.ArgumentParser(description='RSA encoder and digital signature generator')
 
@@ -36,29 +63,17 @@ def gen_rsa(filename, bits):
     pubkey, privkey = rsa.newkeys(bits, exponent=exp)
     signpubkey, signprivkey = rsa.newkeys(1024, exponent=exp)
 
-    try:
-        mystr = F"e = \"{hex(exp)[2:]} \"\n" \
-                F"n = \"{hex(pubkey.n)[2:]}\"\n" \
-                F"d = \"{hex(privkey.d)[2:]}\"\n" \
-                F"p = \"{hex(privkey.p)[2:]}\"\n" \
-                F"q = \"{hex(privkey.q)[2:]}\"\n" \
-                F"sign_n = \"{hex(signpubkey.n)[2:]}\"\n" \
-                F"sign_d = \"{hex(signprivkey.d)[2:]} \""
-        with open(filename, "w") as file:
-            file.write(mystr)
-    except:
-        print(F"e = \"{hex(exp)[2:]}\"")
-        print(F"n = \"{hex(pubkey.n)[2:]}\"")
-        print(F"d = \"{hex(privkey.d)[2:]}\"")
-        print(F"p = \"{hex(privkey.p)[2:]}\"")
-        print(F"q = \"{hex(privkey.q)[2:]}\"")
-
+    _print_params(filename,
+                  exp,
+                  pubkey.n,
+                  privkey.d,
+                  privkey.p,
+                  privkey.q,
+                  signpubkey.n,
+                  signprivkey.d)
 
 def gen_rsa_wiener_vuln(filename, bits):
-    p = randprime(2 ** ((bits//2) - 1), 2 ** (bits//2))
-    q = randprime(2 ** ((bits//2) - 1), 2 ** (bits//2))
-    p, q = max(p, q), min(p, q) #)))))
-    n = p * q
+    n, p, q = _getNPQ(bits)
     n = Decimal(n)
     d = randint(0x10001, int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()))
     while True:
@@ -69,23 +84,29 @@ def gen_rsa_wiener_vuln(filename, bits):
             continue
         break
     n = int(n)
-    try:
-        mystr = F"e = \"{hex(e)[2:]}\"\n" \
-                F"n = \"{hex(n)[2:]}\"\n" \
-                F"d = \"{hex(d)[2:]}\"\n" \
-                F"p = \"{hex(p)[2:]}\"\n" \
-                F"q = \"{hex(q)[2:]}\"\n" \
-                F"sign_n = \"{hex(n)[2:]}\"\n" \
-                F"sign_d = \"{hex(d)[2:]} \""
-        with open(filename, "w") as file:
-            file.write("This file should always be in place\n")
-            file.write(mystr)
-    except:
-        print(F"e = \"{hex(e)[2:]}\"")
-        print(F"n = \"{hex(n)[2:]}\"")
-        print(F"d = \"{hex(d)[2:]}\"")
-        print(F"p = \"{hex(p)[2:]}\"")
-        print(F"q = \"{hex(q)[2:]}\"")
+    _print_params(filename,
+                  e, n, d, p, q, n, d
+                  )
+
+
+def gen_rsa_self(filename, bits):
+    n, p, q = _getNPQ(bits)
+    n = Decimal(n)
+    d = randint(int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()),
+                int(n - (Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()))
+    while True:
+        try:
+            e = modinv(d, (p - 1) * (q - 1))
+        except:
+            d = randint(int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()),
+                        int(n - (Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()))
+            continue
+        break
+    n = int(n)
+
+    _print_params(filename,
+                  e, n, d, p, q, n, d
+                  )
 
 
 if __name__ == '__main__':
