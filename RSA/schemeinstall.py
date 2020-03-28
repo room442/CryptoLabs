@@ -55,8 +55,8 @@ def gen_rsa(filename, bits):
 
 
 def gen_rsa_wiener_vuln(filename, bits):
-    p = randprime(2 ** (bits - 1), 2 ** bits)
-    q = randprime(2 ** (bits - 1), 2 ** bits)
+    p = randprime(2 ** ((bits//2) - 1), 2 ** (bits//2))
+    q = randprime(2 ** ((bits//2) - 1), 2 ** (bits//2))
     n = p * q
     n = Decimal(n)
     e = 0x10001
