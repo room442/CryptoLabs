@@ -4,6 +4,7 @@ from util import auto_int, modinv
 from sympy import randprime
 from random import randint
 from math import sqrt
+from decimal import Decimal
 
 
 def get_args():
@@ -57,8 +58,16 @@ def gen_rsa_wiener_vuln(filename, bits):
     p = randprime(2 ** (bits - 1), 2 ** bits)
     q = randprime(2 ** (bits - 1), 2 ** bits)
     n = p * q
-    d = randint(0x10001, int(pow(n, 0.25))//4)
-    e = modinv(d, (p - 1) * (q - 1))
+    n = Decimal(n)
+    e = 0x10001
+    while True:
+        try:
+            d = modinv(e, (p - 1) * (q - 1))
+        except:
+            continue
+        if d > int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()):
+            continue
+        break
     try:
         mystr = F"e = \"{hex(e)[2:]} \"\n" \
                 F"n = \"{hex(n)[2:]}\"\n" \
