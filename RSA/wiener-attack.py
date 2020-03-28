@@ -31,11 +31,12 @@ def attack(n, e, m):
         if RSAencrypt(m, (e * d), n) == m % n: # Encrypt m with e*d, where d is known. M can be already encrypted, it doesnt metter
             print(F"i = {i}")
             return d
+    return None
 
 
 if __name__ == '__main__':
     args = get_args()
     if args.file:
-        attack(n, e, 0x111111)
+        print(F"Find d: {hex(attack(int(n, 16), int(e, 16), 0x111111))}")
     else:
-        print(attack(args.n, args.e, 0x111111))
+        print(F"Find d: {attack(args.n, args.e, 0x111111)}")
