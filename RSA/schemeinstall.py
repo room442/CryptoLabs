@@ -68,6 +68,7 @@ def gen_rsa_wiener_vuln(filename, bits):
             d = randint(0x10001, int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()))
             continue
         break
+    n = int(n)
     try:
         mystr = F"e = \"{hex(e)[2:]} \"\n" \
                 F"n = \"{hex(n)[2:]}\"\n" \
