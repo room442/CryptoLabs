@@ -64,8 +64,10 @@ def gen_rsa_wiener_vuln(filename, bits):
         try:
             d = modinv(e, (p - 1) * (q - 1))
         except:
+            e = e+1
             continue
         if d > int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()):
+            e = e+1
             continue
         break
     try:
