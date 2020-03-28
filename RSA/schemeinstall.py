@@ -7,24 +7,34 @@ from math import sqrt
 from decimal import Decimal
 
 
-def _print_params(filename, e, n, d, p, q, nn, dd):
+def _print_params(filename, e, n, d, p, q, nn, dd, openmode="w", num=0):
     try:
-        mystr = F"e = \"{hex(e)[2:]}\"\n" \
-                F"n = \"{hex(n)[2:]}\"\n" \
-                F"d = \"{hex(d)[2:]}\"\n" \
-                F"p = \"{hex(p)[2:]}\"\n" \
-                F"q = \"{hex(q)[2:]}\"\n" \
-                F"sign_n = \"{hex(nn)[2:]}\"\n" \
-                F"sign_d = \"{hex(dd)[2:]} \""
-        with open(filename, "w") as file:
+        if num == 0 :
+            mystr = F"e = \"{hex(e)[2:]}\"\n" \
+                    F"n = \"{hex(n)[2:]}\"\n" \
+                    F"d = \"{hex(d)[2:]}\"\n" \
+                    F"p = \"{hex(p)[2:]}\"\n" \
+                    F"q = \"{hex(q)[2:]}\"\n" \
+                    F"sign_n = \"{hex(nn)[2:]}\"\n" \
+                    F"sign_d = \"{hex(dd)[2:]} \""
+        else:
+            mystr = F"e_{num} = \"{hex(e)[2:]}\"\n" \
+                    F"n_{num} = \"{hex(n)[2:]}\"\n" \
+                    F"d_{num} = \"{hex(d)[2:]}\"\n" \
+                    F"p_{num} = \"{hex(p)[2:]}\"\n" \
+                    F"q_{num} = \"{hex(q)[2:]}\"\n" \
+                    F"sign_n_{num} = \"{hex(nn)[2:]}\"\n" \
+                    F"sign_d_{num} = \"{hex(dd)[2:]} \""
+        with open(filename, openmode) as file:
             file.write("This file should always be in place\n")
             file.write(mystr)
     except:
-        print(F"e = \"{hex(e)[2:]}\"")
-        print(F"n = \"{hex(n)[2:]}\"")
-        print(F"d = \"{hex(d)[2:]}\"")
-        print(F"p = \"{hex(p)[2:]}\"")
-        print(F"q = \"{hex(q)[2:]}\"")
+        print(F"e_{num} = \"{hex(e)[2:]}\"")
+        print(F"n_{num} = \"{hex(n)[2:]}\"")
+        print(F"d_{num} = \"{hex(d)[2:]}\"")
+        print(F"p_{num} = \"{hex(p)[2:]}\"")
+        print(F"q_{num} = \"{hex(q)[2:]}\"")
+
 
 def _getNPQ(bits):
     p = randprime(2 ** ((bits // 2) - 1), 2 ** (bits // 2))
@@ -54,6 +64,15 @@ def get_args():
                         action="store_true",
                         help="Generate wiener-attack unimmune params")
 
+    parser.add_argument("--special",
+                        action="store_true",
+                        help="Generate small e")
+
+    parser.add_argument("-c", "--clients",
+                        type=int,
+                        default=3,
+                        help="Number of clients to generate")
+
     return parser.parse_args()
 
 
@@ -71,6 +90,7 @@ def gen_rsa(filename, bits):
                   privkey.q,
                   signpubkey.n,
                   signprivkey.d)
+
 
 def gen_rsa_wiener_vuln(filename, bits):
     n, p, q = _getNPQ(bits)
@@ -109,9 +129,34 @@ def gen_rsa_self(filename, bits):
                   )
 
 
+def gen_rsa_special_vuln(filename, bits, clientnum):
+    n, p, q, d = [], [], [], []
+    e = 3
+
+    for _ in range(clientnum):
+        while True:
+            try:
+                nn, pp, qq = _getNPQ(bits)
+                dd = modinv(e, (pp-1)*(qq-1))
+                n.append(nn)
+                p.append(pp)
+                q.append(qq)
+                d.append(dd)
+            except:
+                continue
+            break
+
+    open(filename, "w").close() #clear the file
+    for i in range(len(n)):
+        _print_params(filename, e, n[i], d[i], p[i], q[i], n[i], d[i], "a", i+1)
+
+
+
 if __name__ == '__main__':
     args = get_args()
     if args.wiener:
         gen_rsa_wiener_vuln(args.f, args.BITS)
+    elif args.special:
+        gen_rsa_special_vuln(args.f, args.BITS, args.clients)
     else:
         gen_rsa(args.f, args.BITS)
