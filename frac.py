@@ -22,10 +22,13 @@ def contFrac(a, b, k=3):
 
     return cf
 
-def getPQ(i, frac):
+def getPQ(frac):
 
-    P = [1, 0]
-    Q = [0, 1]
+    P = [frac[0],   frac[0]*frac[1]+1]
+    Q = [1,         frac[1]]
 
-    for j in range(2, i+2):
-        P_j = frac[j-1]
+    for k in range(2, len(frac)):
+        P.append(P[k-1] * frac[k] + P[k-2])
+        Q.append(Q[k-1] * frac[k] + Q[k-2])
+
+    return P, Q
