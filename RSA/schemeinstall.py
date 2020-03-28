@@ -15,6 +15,14 @@ def get_args():
     parser.add_argument("-f",
                         help="file to save")
 
+    parser.add_argument("--self",
+                        action="store_true",
+                        help="Use key-generation algorithm insted of rsa lib. Can use params")
+
+    parser.add_argument("--wienner",
+                        action="store_true",
+                        help="Generate wienner-attack immune params")
+
     return parser.parse_args()
 
 
