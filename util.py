@@ -1,4 +1,3 @@
-import math
 
 
 def auto_int(x):
@@ -21,15 +20,3 @@ def modinv(a, m):
         return x % m
 
 
-def contFrac(x, k=3):
-    cf = []
-    q = math.floor(x)
-    cf.append(q)
-    x = x - q
-    i = 0
-    while x != 0 and i < k:
-        q = math.floor(1 / x)
-        cf.append(q)
-        x = 1 / x - q
-        i = i + 1
-    return cf
