@@ -60,15 +60,15 @@ def gen_rsa_wiener_vuln(filename, bits):
     p, q = max(p, q), min(p, q) #)))))
     n = p * q
     n = Decimal(n)
-    e = randint(q, p)
+    e = randint(0x10001, n)
     while True:
         try:
             d = modinv(e, (p - 1) * (q - 1))
         except:
-            e = e+1
+            e = randint(0x10001, n)
             continue
         if d > int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()):
-            e = e+1
+            e = randint(0x10001, n)
             continue
         break
     try:
