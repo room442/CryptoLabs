@@ -35,6 +35,13 @@ def _print_params(filename, e, n, d, p, q, nn, dd, openmode="w", num=0):
         print(F"p_{num} = \"{hex(p)[2:]}\"")
         print(F"q_{num} = \"{hex(q)[2:]}\"")
 
+def _print_arr(filename, name, arr):
+    with open(filename, "a") as file:
+        file.write(F"{name} = [")
+        for elem in arr:
+            file.write(F"{elem}, ")
+        file.write("]\n")
+
 
 def _getNPQ(bits):
     p = randprime(2 ** ((bits // 2) - 1), 2 ** (bits // 2))
@@ -146,9 +153,15 @@ def gen_rsa_special_vuln(filename, bits, clientnum):
                 continue
             break
 
-    open(filename, "w").close() #clear the file
-    for i in range(len(n)):
-        _print_params(filename, e, n[i], d[i], p[i], q[i], n[i], d[i], "a", i+1)
+    with open(filename, "w") as file:
+        file.write(F"e ={e}\n")
+    _print_arr(filename, "n", n)
+    _print_arr(filename, "d", d)
+    _print_arr(filename, "p", p)
+    _print_arr(filename, "q", q)
+    _print_arr(filename, "sign_n", n)
+    _print_arr(filename, "sign_d", d)
+    
 
 
 
