@@ -39,7 +39,7 @@ def _print_arr(filename, name, arr):
     with open(filename, "a") as file:
         file.write(F"{name} = [")
         for elem in arr:
-            file.write(F"{elem}, ")
+            file.write(F"\"{hex(elem)[2:]}\", ")
         file.write("]\n")
 
 
