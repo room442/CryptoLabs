@@ -3,7 +3,7 @@ from util import auto_int
 from frac import contFrac, getPQ
 import argparse
 from RSA.crypto import RSAencrypt
-from RSA.wiener_vuln import *
+from RSA.wiener_vuln_params import *
 
 
 def get_args():
@@ -19,7 +19,7 @@ def get_args():
 
     parser.add_argument("--file",
                         action="store_true",
-                        help="Use wiener_vuln.py for params")
+                        help="Use wiener_vuln_params.py for params")
 
     return parser.parse_args()
 
