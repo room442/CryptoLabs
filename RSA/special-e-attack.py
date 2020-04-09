@@ -13,24 +13,22 @@ Will use file special_vuln_params.py
 def get_args():
     parser = argparse.ArgumentParser(description='Attack on broadcast message with small e')
 
-
     return parser.parse_args()
 
 
 def attack(ms):
-
     nn = [int(nnn, 16) for nnn in n]
     x = crt(nn, ms)
 
-    xx = (Decimal(x[0]).__pow__(Decimal(1)/Decimal(e)))
+    xx = (Decimal(x[0]).__pow__(Decimal(1) / Decimal(e)))
 
-    m = int(xx)+1
+    m = int(xx) + 1
 
     print(hex(m))
 
 
 if __name__ == '__main__':
-    #Вот тут можно добавить файл, хотя хз красиво ли это или лучше все выносить в мейн, но пока что мне лень
+    # Вот тут можно добавить файл, хотя хз красиво ли это или лучше все выносить в мейн, но пока что мне лень
 
     ms = []
     for i, _ in enumerate(n):
