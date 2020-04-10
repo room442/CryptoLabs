@@ -171,5 +171,7 @@ if __name__ == '__main__':
         gen_rsa_wiener_vuln(args.f, args.BITS)
     elif args.special:
         gen_rsa_special_vuln(args.f, args.BITS, args.clients)
+    elif args.self:
+        gen_rsa_self(args.f, args.BITS)
     else:
         gen_rsa(args.f, args.BITS)
