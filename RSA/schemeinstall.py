@@ -24,7 +24,7 @@ def _print_params(filename, e, n, d, p, q, nn, dd, openmode="w", num=0):
                     F"p_{num} = \"{hex(p)[2:]}\"\n" \
                     F"q_{num} = \"{hex(q)[2:]}\"\n" \
                     F"sign_n_{num} = \"{hex(nn)[2:]}\"\n" \
-                    F"sign_d_{num} = \"{hex(dd)[2:]} \""
+                    F"sign_d_{num} = \"{hex(dd)[2:]}\""
         with open(filename, openmode) as file:
             file.write("#This file should always be in place\n")
             file.write(mystr)
