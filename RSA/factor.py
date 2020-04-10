@@ -37,7 +37,7 @@ def factorise(n, e, d, bobe):
         f = f + 1
         N = N // 2
     while True:
-        a = randint(2, n-1)
+        a = randint(2, n - 1)
         l = 0
         b = pow(a, N, n)
         bb = pow(b, 2, n)
@@ -48,14 +48,13 @@ def factorise(n, e, d, bobe):
             continue
         else:
             t = b
-            p = gcd(t+1, n)
-            q = gcd(t-1, n)
+            p = gcd(t + 1, n)
+            q = gcd(t - 1, n)
             if p == 1 or q == 1:
                 continue
             break
 
-
-    phi = (p-1)*(q-1) #check if it is n-1
+    phi = (p - 1) * (q - 1)  # check if it is n-1
 
     if bobe != 0:
         bobd = modinv(bobe, phi)
@@ -65,9 +64,8 @@ def factorise(n, e, d, bobe):
     return p, q, bobd
 
 
-
 if __name__ == '__main__':
     args = parse_args()
     p, q, bobd = factorise(args.n, args.e, args.d, args.bobkey)
 
-    print(F"p = {p}, q = {q}")
+    print(F"p = {hex(p)[2:]}, q = {hex(q)[2:]}")
