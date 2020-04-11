@@ -21,7 +21,7 @@ def get_data(connection):
     return data
 
 
-def server():
+def server(verbose=False):
     # Настраиваем сокет
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((ip, port))
@@ -35,6 +35,13 @@ def server():
         p, r, t_a = MOdecodeParams(msg)
 
         e, d = MOgetKeys(p)
+
+        if verbose:
+            print(F"SERVER 1st msg: {msg}")
+            print(F"SERVER p = {p}")
+            print(F"SERVER t_a = {t_a}")
+            print(F"SERVER e = {e}")
+            print(F"SERVER d = {d}")
 
         while True:
             try:
@@ -52,6 +59,18 @@ def server():
 
         opentext = AES256decrypt(encrypted, int.to_bytes(t, AES.key_size[-1], "big"))
         connection.close()
+
+        if verbose:
+            print(F"SERVER t_ab = {t_ab}")
+            print(F"SERVER 2nd msg: {MOencodeResponse(t_ab)}")
+            print(F"SERVER 3rd msg: {msg}")
+            print(F"SERVER t_b = {t_b}")
+            print(F"SERVER len = {len}")
+            print(F"SERVER encrypted[:100] = {bytes(encrypted)[:100]}")
+            print(F"SERVER t = {t}")
+            print(F"SERVER opentext[:100] = {bytes(opentext)[:100]}")
+
+
 
         try:
             os.mkdir("received")
