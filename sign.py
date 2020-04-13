@@ -31,7 +31,7 @@ def parse(decoder, integers):
     return integers
 
 
-def rsa_encrypt(m, e, n):
+def rsa_encr(m, e, n):
     return pow(m, e, n)
 
 
@@ -45,7 +45,7 @@ def rsa_add_sign(filename, d, n):
 
     r = sha256(data).hexdigest()
 
-    return rsa_encrypt(int(r, 16), d, n)
+    return rsa_encr(int(r, 16), d, n)
 
 
 def rsa_check_sign(filename, e, n, sign):
