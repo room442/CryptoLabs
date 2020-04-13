@@ -39,11 +39,11 @@ def RSAdecrypt(c, d, n):
     return pow(c, d, n)
 
 
-iv = get_random_bytes(AES.block_size)
+# iv = get_random_bytes(AES.block_size)
+iv = b'\x00' * AES.block_size
 
 
-
-def AES256encrypt(data):
+def aes_encrypt(data):
     key = get_random_bytes(AES.key_size[-1])
     cipher = AES.new(key, AES.MODE_CBC, iv)
 
@@ -52,7 +52,7 @@ def AES256encrypt(data):
     return ciphertext, key
 
 
-def AES256decrypt(data, key):
+def aes_decrypt(data, key):
     decipher = AES.new(key, AES.MODE_CBC, iv)
 
     decrypted = unpad(decipher.decrypt(data), AES.block_size)
@@ -60,7 +60,7 @@ def AES256decrypt(data, key):
     return decrypted
 
 
-def RSAencode(
+def to_asn(
         n,
         e,
         c,  # encrypted aes256 key
@@ -105,7 +105,7 @@ def RSAencode(
     return encoder.output()
 
 
-def RSAdecode(filename):  # type: (filename) -> (n, e, c, ciphertext)
+def from_asn(filename):  # type: (filename) -> (n, e, c, ciphertext)
     integers = []  # list of integers in ASN.1 file
     with open(filename, "rb") as file:
         data = file.read()
@@ -116,10 +116,10 @@ def RSAdecode(filename):  # type: (filename) -> (n, e, c, ciphertext)
     return integers[0], integers[1], integers[2], cipher
 
 
-def RSAfileEncrypt(filename):
+def encr_file(filename):
     with open(filename, "rb") as file:
         data = file.read()
-        encrypted, key = AES256encrypt(data)
+        encrypted, key = aes_encrypt(data)
 
     print(F"AES key: {hex(int.from_bytes(key, 'big'))[2:]}")
 
@@ -133,7 +133,7 @@ def RSAfileEncrypt(filename):
     print("d = ", d)
     print("n = ", n)
 
-    encoded = RSAencode(
+    encoded = to_asn(
         int(n, 16),
         int(e, 16),
         encrypted_key,
@@ -145,8 +145,8 @@ def RSAfileEncrypt(filename):
         file.write(encoded)
 
 
-def RSAfileDecrypt(filename):
-    n, e, encrypted_key, encrypted = RSAdecode(filename)
+def decr_file(filename):
+    n, e, encrypted_key, encrypted = from_asn(filename)
 
     print("e = ", e)
     print("d = ", d)
@@ -160,7 +160,7 @@ def RSAfileDecrypt(filename):
 
     key = key.to_bytes(AES.key_size[-1], "big")
 
-    decrypted = AES256decrypt(encrypted, key)
+    decrypted = aes_decrypt(encrypted, key)
 
     with open(filename + ".dec", "wb") as file:
         file.write(decrypted)
@@ -170,6 +170,6 @@ if __name__ == '__main__':
     if len(sys.argv) != 3:
         print("cipher.py -[ed] filename")
     if sys.argv[1] == "-e":
-        RSAfileEncrypt(sys.argv[2])
+        encr_file(sys.argv[2])
     elif sys.argv[1] == "-d":
-        RSAfileDecrypt(sys.argv[2])
+        decr_file(sys.argv[2])
