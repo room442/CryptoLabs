@@ -147,9 +147,9 @@ def encr_file(filename):
 def decr_file(filename):
     n, e, encrypted_key, encrypted = from_asn(filename)
 
-    print("e = ", e)
+    print("e = ", hex(e)[2:])
     print("d = ", d)
-    print("n = ", n)
+    print("n = ", hex(n)[2:])
 
     key = RSAdecrypt(
         encrypted_key,
