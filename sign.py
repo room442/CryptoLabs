@@ -6,7 +6,7 @@ import sys
 import asn1
 from hashlib import sha256
 
-def parse(decoder, integers):
+def parse(decoder, integers): # такой же парсер, как и в шифровании
     while not decoder.eof():
         try:
             tag = decoder.peek()
@@ -39,7 +39,7 @@ def rsa_decrypt(c, d, n):
     return pow(c, d, n)
 
 
-def rsa_add_sign(filename, d, n):
+def rsa_add_sign(filename, d, n): # тут смысл в том, что мы шифруем хеш-значение от данных в файле -- это и будет подписи.
     with open(filename, "rb") as file:
         data = file.read()
 
@@ -48,7 +48,7 @@ def rsa_add_sign(filename, d, n):
     return rsa_encr(int(r, 16), d, n)
 
 
-def rsa_check_sign(filename, e, n, sign):
+def rsa_check_sign(filename, e, n, sign): # соответственно расшифровываем то, что нам передали и сверяем хеш-значение.
     s = rsa_decrypt(sign, e, n)
 
     with open(filename, "rb") as file:
@@ -66,7 +66,7 @@ def sign_to_asn(
         n,
         e,
         sign
-):
+): # тут принцип такой же, как в шифровании, просто немного другой формат
     encoder = asn1.Encoder()
 
     encoder.start()
@@ -75,7 +75,7 @@ def sign_to_asn(
     encoder.enter(asn1.Numbers.Set)
     encoder.enter(asn1.Numbers.Sequence)
 
-    encoder.write(b'\x00\x40', asn1.Numbers.OctetString)
+    encoder.write(b'\x00\x40', asn1.Numbers.OctetString) # идентификатор подписи
     encoder.write(b'\x0C\x00', asn1.Numbers.UTF8String)
 
     encoder.enter(asn1.Numbers.Sequence)
@@ -87,7 +87,7 @@ def sign_to_asn(
     encoder.leave()
 
     encoder.enter(asn1.Numbers.Sequence)
-    encoder.write(sign, asn1.Numbers.Integer)
+    encoder.write(sign, asn1.Numbers.Integer) #сама подпись в качестве шифротекста
     encoder.leave()
 
     encoder.leave()
@@ -97,7 +97,7 @@ def sign_to_asn(
     encoder.enter(asn1.Numbers.Sequence)
     encoder.leave()
 
-    encoder.leave()
+    encoder.leave() # на этот раз зашифрованных данных нет.
 
     return encoder.output()
 
