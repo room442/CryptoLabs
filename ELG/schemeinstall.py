@@ -1,5 +1,5 @@
 import argparse
-from sympy import randprime
+from sympy import randprime,  isprime
 from random import randint
 from util import auto_int
 
@@ -21,28 +21,26 @@ def get_args():
 
 def gen_elg(filename, bits):
     def gen_p():
-        return randprime(2 ** bits, 2 ** (bits + 1))
+        while True:
+            p1 = randprime(2**(bits-1), 2**(bits))
+            p1 = (339386177002760482600239301413093740958616760302151848390552942930762297295213572171311950930933593543236070519889888679092428618587002337882482460717637418118082916909433900556103056132121618886707585999925527839883535073562715771894677877009039941024040993197552060215414950720782088758245094436639165829439-1)//2
+            if isprime(p1*2+1):
+                return p1*2+1, p1
 
-    def gen_a(p):
-        def gen_primitive_root(r):
-            a = randint(1, r)
-            phi_r = r - 1  # r is prime
-            while pow(a, phi_r, r) != 1:  # aways true, as r is prime
-                a = randint(1, r)
-
-            return a
-
-        r = randprime(2 ** (bits - 1), p)
-        return r, gen_primitive_root(r)
+    def gen_a(p, r):
+        a = randint(1, p)
+        while pow(a, 2, p-1) == 1:
+            a = randint(1, p)
+        return a
 
     def gen_x(r):
-        return randprime(1, r)  # Maybe x should be big?
+        return randprime(1, r)
 
     def gen_b(a, x, p):
         return pow(a, x, p)
 
-    p = gen_p()
-    r, a = gen_a(p)
+    p, r = gen_p()
+    a = gen_a(p, r)
     x = gen_x(r)
     b = gen_b(a, x, p)
 
