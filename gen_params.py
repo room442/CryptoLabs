@@ -1,6 +1,6 @@
 import argparse
 import rsa  # for keys
-from sympy import randprime, mod_inverse
+from sympy import randprime, mod_inverse, isprime
 from random import randint
 from math import sqrt
 from decimal import Decimal
