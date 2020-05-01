@@ -5,7 +5,7 @@ from math import gcd
 from GOST.curves import *
 
 
-def ELGSignAdd(filename, d, p, A, B, m, q, xp, yp):
+def GOSTSignAdd(filename, d, p, A, B, m, q, xp, yp):
     with open(filename, "rb") as file:
         data = file.read()
 
@@ -48,3 +48,9 @@ def GOSTSignCheck(filename, xq, yq, p, A, B, m, q, xp, yp, r, s):
     R = xc % q
 
     return r == R
+
+def get_keys(p, A, B, m, q, xp, yp):
+    d = randint(1, q)
+    xq, yq = point_mult(xp, yp, d, p, A)
+
+    return d, xq, yq
