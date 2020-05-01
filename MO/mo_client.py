@@ -20,14 +20,24 @@ def get_data(connection):
     return data
 
 
-def sendfile(filename, p, ip, port):
+def sendfile(filename, p, ip, port, verbose=False):
     e, d = MOgetKeys(p)
+    if verbose:
+        print(F"CLIENT e = {e}")
+        print(F"CLIENT d = {d}")
 
     with open(filename, "rb") as file:
         data = file.read()
+        if verbose:
+            print(F"CLIENT opendata[:100] = {bytes(data)[:100]}")
 
     encrypted, key = AES256encrypt(data)
     datalen = len(encrypted)
+    if verbose:
+        print(F"CLIENT encdata[:100] = {bytes(encrypted)[:100]}")
+        print(F"CLIENT enckey = {key}")
+        print(F"CLIENT datalen = {datalen}")
+
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((ip, port))
@@ -48,6 +58,15 @@ def sendfile(filename, p, ip, port):
 
     client.send(MOencodeFinish(t_b, datalen, encrypted))
 
+    if verbose:
+        print(F"CLIENT p = {p}")
+        print(F"CLIENT t_a = {t_a}")
+        print(F"CLIENT encoded 1st msg = {MOencodeParams(p, p - 1, t_a)}")
+        print(F"CLIENT encoded 2nd msg = {msg}")
+        print(F"CLIENT t_ab = {t_ab}")
+        print(F"CLIENT t_b = {t_b}")
+        print(F"CLIENT encoded 3rd msg = {MOencodeFinish(t_b, datalen, encrypted)}")
 
-def client(filename, p):
-    sendfile(filename, p, ip, port)
+
+def client(filename, p, verbose=False):
+    sendfile(filename, p, ip, port, verbose)

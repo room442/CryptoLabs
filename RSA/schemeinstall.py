@@ -9,7 +9,7 @@ from decimal import Decimal
 
 def _print_params(filename, e, n, d, p, q, nn, dd, openmode="w", num=0):
     try:
-        if num == 0 :
+        if num == 0:
             mystr = F"e = \"{hex(e)[2:]}\"\n" \
                     F"n = \"{hex(n)[2:]}\"\n" \
                     F"d = \"{hex(d)[2:]}\"\n" \
@@ -24,7 +24,7 @@ def _print_params(filename, e, n, d, p, q, nn, dd, openmode="w", num=0):
                     F"p_{num} = \"{hex(p)[2:]}\"\n" \
                     F"q_{num} = \"{hex(q)[2:]}\"\n" \
                     F"sign_n_{num} = \"{hex(nn)[2:]}\"\n" \
-                    F"sign_d_{num} = \"{hex(dd)[2:]} \""
+                    F"sign_d_{num} = \"{hex(dd)[2:]}\""
         with open(filename, openmode) as file:
             file.write("#This file should always be in place\n")
             file.write(mystr)
@@ -34,6 +34,7 @@ def _print_params(filename, e, n, d, p, q, nn, dd, openmode="w", num=0):
         print(F"d_{num} = \"{hex(d)[2:]}\"")
         print(F"p_{num} = \"{hex(p)[2:]}\"")
         print(F"q_{num} = \"{hex(q)[2:]}\"")
+
 
 def _print_arr(filename, name, arr):
     with open(filename, "a") as file:
@@ -74,6 +75,10 @@ def get_args():
     parser.add_argument("--special",
                         action="store_true",
                         help="Generate small e")
+
+    parser.add_argument("--factor",
+                        action="store_true",
+                        help="Generate two pairs in one n")
 
     parser.add_argument("-c", "--clients",
                         type=int,
@@ -144,7 +149,7 @@ def gen_rsa_special_vuln(filename, bits, clientnum):
         while True:
             try:
                 nn, pp, qq = _getNPQ(bits)
-                dd = modinv(e, (pp-1)*(qq-1))
+                dd = modinv(e, (pp - 1) * (qq - 1))
                 n.append(nn)
                 p.append(pp)
                 q.append(qq)
@@ -161,8 +166,42 @@ def gen_rsa_special_vuln(filename, bits, clientnum):
     _print_arr(filename, "q", q)
     _print_arr(filename, "sign_n", n)
     _print_arr(filename, "sign_d", d)
-    
 
+
+def gen_rsa_one_n(filename, bits):
+    n, p, q = _getNPQ(bits)
+    n = Decimal(n)
+    d = randint(int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()),
+                int(n - (Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()))
+    while True:
+        try:
+            e = modinv(d, (p - 1) * (q - 1))
+        except:
+            d = randint(int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()),
+                        int(n - (Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()))
+            continue
+        break
+    dd = randint(int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()),
+                 int(n - (Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()))
+    while True:
+        try:
+            ee = modinv(dd, (p - 1) * (q - 1))
+        except:
+            dd = randint(int((Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()),
+                         int(n - (Decimal(1) / Decimal(3)) * Decimal(n).sqrt().sqrt()))
+            continue
+        break
+    n = int(n)
+
+    with open(filename, "w") as file:
+        pass
+    _print_arr(filename, "e", [e, ee])
+    with open(filename, "a") as file:
+        file.write(F"n = \"{hex(n)[2:]}\"\n")
+    _print_arr(filename, "d", [d, dd])
+    with open(filename, "a") as file:
+        file.write(F"p = \"{hex(p)[2:]}\"\n")
+        file.write(F"q = \"{hex(q)[2:]}\"\n")
 
 
 if __name__ == '__main__':
@@ -171,5 +210,9 @@ if __name__ == '__main__':
         gen_rsa_wiener_vuln(args.f, args.BITS)
     elif args.special:
         gen_rsa_special_vuln(args.f, args.BITS, args.clients)
+    elif args.factor:
+        gen_rsa_one_n(args.f, args.BITS)
+    elif args.self:
+        gen_rsa_self(args.f, args.BITS)
     else:
         gen_rsa(args.f, args.BITS)

@@ -37,19 +37,21 @@ def RSAfileEncrypt(filename):
         data = file.read()
         encrypted, key = aes_common.AES256encrypt(data)
 
+    print(F"AES key: {hex(int.from_bytes(key, 'big'))[2:]}")
+
     encrypted_key = RSAencrypt(
         int.from_bytes(key, "big"),
-        int(exp, 16),
+        int(e, 16),
         int(n, 16)
     )
 
-    print("e = ", exp)
+    print("e = ", e)
     print("d = ", d)
     print("n = ", n)
 
     encoded = RSAencode(
         int(n, 16),
-        int(exp, 16),
+        int(e, 16),
         encrypted_key,
         len(encrypted),
         encrypted
@@ -98,7 +100,7 @@ def RSAfileCheckSignature(filename, sig_filename):
     n, sign = RSAdecodeSign(sig_filename)
     return RSAsignCheck(
         filename,
-        int(exp, 16),
+        int(e, 16),
         n,
         sign
     )

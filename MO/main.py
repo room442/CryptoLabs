@@ -18,35 +18,40 @@ def parse_args():
                         action="store_true",
                         help="Run as a client in MO scheme")
 
+    parser.add_argument("--verbose",
+                        action="store_true",
+                        default=False,
+                        help="Run with verbose mode")
+
     return parser.parse_args()
 
 
-def MO_three_pass(filename):
-    server = Process(target=mo_server.server, args=())
+def MO_three_pass(filename, verbose=False):
+    server = Process(target=mo_server.server, args=verbose)
     server.start()
     time.sleep(0.1)
-    client = Process(target=mo_client.client, args=(filename, int(r, 16)))
+    client = Process(target=mo_client.client, args=(filename, int(r, 16), verbose))
 
     client.start()
     server.join()
     client.join()
 
 
-def MO_server():
-    mo_server.server()
+def MO_server(verbose=False):
+    mo_server.server(verbose)
 
 
-def MO_client(filename):
-    mo_client.client(filename, int(r, 16))
+def MO_client(filename, verbose=False):
+    mo_client.client(filename, int(r, 16), verbose)
 
 
 if __name__ == '__main__':
     args = parse_args()
     try:
         if args.server == True:
-            MO_server()
+            MO_server(args.verbose)
         elif args.client == True:
-            MO_client(args.FILE)
+            MO_client(args.FILE, args.verbose)
         else:
             MO_three_pass(args.FILE)
 
