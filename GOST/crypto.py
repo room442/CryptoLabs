@@ -49,7 +49,7 @@ def GOSTSignCheck(filename, xq, yq, p, A, B, m, q, xp, yp, r, s):
 
     return r == R
 
-def get_keys(p, A, B, m, q, xp, yp):
+def GOSTgenKeys(p, A, B, m, q, xp, yp):
     d = randint(1, q)
     xq, yq = point_mult(xp, yp, d, p, A)
 
