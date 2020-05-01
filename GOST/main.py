@@ -33,7 +33,7 @@ def parse_args():
 
 def GOSTfileSign(filename):
     d, xq, yq = GOSTgenKeys(p, A, B, q, q, x, y)
-    r, s = GOSTSignAdd(filename, d, p, A, B, q, x, y)
+    r, s = GOSTSignAdd(filename, d, p, A, B, q, q, x, y)
     with open(filename + ".sign", "wb") as file:
         file.write(
             GOSTencodeSign(xq, yq, p, A, B, x, y, q, r, s)
@@ -41,7 +41,7 @@ def GOSTfileSign(filename):
 
 def GOSTfileCheckSignature(filename, sig_filename):
     xq_decoded, yq_decoded, prime_decoded, A_decoded, B_decoded, xp_decoded, yp_decoded, q_decoded, r_decoded, s_decoded = GOSTdecodeSign(sig_filename)
-    return GOSTSignCheck(filename, xq_decoded, yq_decoded, prime_decoded, A_decoded, B_decoded, None, q_decoded, xp_decoded, yp_decoded, r_decoded, s_decoded)
+    return GOSTSignCheck(filename, xq_decoded, yq_decoded, prime_decoded, A_decoded, B_decoded, q_decoded, q_decoded, xp_decoded, yp_decoded, r_decoded, s_decoded)
 
 if __name__ == '__main__':
     args = parse_args()
