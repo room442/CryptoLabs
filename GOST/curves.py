@@ -28,7 +28,7 @@ def point_mult(x, y, k, p, A):
         return point_double(x, y, p, A)
 
     xx, yy = x, y
-    mask = bin(k)[3:]
+    mask = bin(k)[2:]
     for i in range(len(mask)):
         xx, yy = point_double(xx, yy, p, A)
         if mask[i] == '1':
