@@ -32,7 +32,7 @@ def point_mult(x, y, k, p, A):
     for i in range(len(mask)):
         xx, yy = point_double(xx, yy, p, A)
         if mask[i] == '1':
-            toRet = point_add(xx, yy, x, y, p, A)
+            xx, yy = point_add(xx, yy, x, y, p, A)
 
     return xx, yy
 
