@@ -14,3 +14,4 @@ params.py
 *.sign
 
 *test*
+.DS_Store
