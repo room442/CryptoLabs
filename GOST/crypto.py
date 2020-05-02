@@ -28,7 +28,7 @@ def GOSTSignAdd(filename, d, p, A, B, m, q, xp, yp):
 
 
 def GOSTSignCheck(filename, xq, yq, p, A, B, m, q, xp, yp, r, s):
-    if r < q or r < 0 or s < q or s < 0:
+    if r > q or r < 0 or s > q or s < 0:
         return False
 
     with open(filename, "rb") as file:
