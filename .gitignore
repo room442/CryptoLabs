@@ -5,7 +5,7 @@ venv_sagepy/
 .idea/
 __pycache__/
 params.py
-
+GOST/pip_packages
 
 *.enc
 
@@ -14,3 +14,4 @@ params.py
 *.sign
 
 *test*
+.DS_Store
