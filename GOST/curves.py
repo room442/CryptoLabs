@@ -2,6 +2,9 @@ from util import modinv
 
 
 def point_double(x, y, p, A):
+    if x == 0 and y == 1:
+        return 0, 1
+
     k = ((3 * x ** 2 + A) * modinv(2 * y, p)) % p
     x3 = (k ** 2 - 2 * x) % p
     y3 = (k * (x - x3) - y) % p
@@ -10,6 +13,10 @@ def point_double(x, y, p, A):
 
 
 def point_add(x1, y1, x2, y2, p, A):
+    if x1 == 0 and y1 == 1:
+        return x2, y2
+    if x2 == 0 and y2 == 1:
+        return x1, y1
     if x1 == x2 and y1 == y2:
         return point_double(x1, y1, p, A)
     k = 1
@@ -19,6 +26,7 @@ def point_add(x1, y1, x2, y2, p, A):
 
     return x3, y3
 
+
 def point_mult(x, y, k, p, A):
     if k == 0:
         return 0, 0
@@ -27,12 +35,10 @@ def point_mult(x, y, k, p, A):
     if k == 2:
         return point_double(x, y, p, A)
 
-    xx, yy = x, y
-    mask = bin(k)[2:]
-    for i in range(len(mask)):
-        xx, yy = point_double(xx, yy, p, A)
-        if mask[i] == '1':
-            xx, yy = point_add(xx, yy, x, y, p, A)
+    qx, qy = 0, 1  # point at inf
+    for bit in bin(k)[2:]:
+        qx, qy = point_double(qx, qy, p, A)
+        if bit == "1":
+            qx, qy = point_add(qx, qy, x, y, p, A)
 
-    return xx, yy
-
+    return qx, qy
