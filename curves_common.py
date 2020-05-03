@@ -1,4 +1,6 @@
 from util import modinv
+from random import randint
+from math import sqrt
 
 
 def point_double(x, y, p, A):
@@ -42,3 +44,12 @@ def point_mult(x, y, k, p, A):
             qx, qy = point_add(qx, qy, x, y, p, A)
 
     return qx, qy
+
+def get_random_point(p, A, B):
+    while True:
+        x = randint(0, p)
+        y = sqrt(pow(x, 3, p) + (A*x)%p + B)
+        if y == int(y):
+            break
+
+    return x, y
