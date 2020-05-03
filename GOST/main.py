@@ -3,6 +3,11 @@ import GOST.params
 from GOST.crypto import *
 import argparse
 
+
+#TODO: изменить все на сейдж, собрать в один файл asn и крипту.
+
+
+
 A = int(GOST.params.a, 10)
 B = int(GOST.params.b, 10)
 p = int(GOST.params.p, 10)
