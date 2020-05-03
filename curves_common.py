@@ -52,4 +52,4 @@ def get_random_point(p, A, B):
         if y == int(y):
             break
 
-    return x, y
+    return x, int(y)
