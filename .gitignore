@@ -13,5 +13,5 @@ GOST/pip_packages
 
 *.sign
 
-*test*
+#*test*
 .DS_Store
