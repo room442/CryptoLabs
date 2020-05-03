@@ -1,4 +1,4 @@
-import GOST.curves as crv
+import curves_common as crv
 from sage.all import *
 import GOST.params as prm
 from random import randint
