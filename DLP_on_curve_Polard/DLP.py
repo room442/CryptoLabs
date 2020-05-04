@@ -60,9 +60,9 @@ if __name__ == '__main__':
         if T_x == T__x and T_y == T__y:
             break
 
-
     if a_ == a__ and b_ == b__:
-        print("oooops")
+        print("Sorry, try again.")
+        exit(-1)
     else:
-        d = ((a_-a__) * modinv(b__ - b_, q))%q
-        print(d)
+        d = ((a_-a__) * modinv((b__ - b_)%q, q))%q
+    print(hex(d))
