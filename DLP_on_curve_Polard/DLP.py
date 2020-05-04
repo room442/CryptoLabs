@@ -14,10 +14,10 @@ Qx = int(prm.Qx, 16)
 Qy = int(prm.Qy, 16)
 
 
-def add_mult(Px, Py, Qx, Qy, a, b, q, A):
-    aPx, aPy = crv.point_mult(Px, Py, a, q, A)
-    bQx, bQy = crv.point_mult(Qx, Qy, b, q, A)
-    return crv.point_add(aPx, aPy, bQx, bQy, q, A)
+def add_mult(_Px, _Py, _Qx, _Qy, _a, _b, _p, _A):
+    aPx, aPy = crv.point_mult(_Px, _Py, _a, _p, _A)
+    bQx, bQy = crv.point_mult(_Qx, _Qy, _b, _p, _A)
+    return crv.point_add(aPx, aPy, bQx, bQy, _p, _A)
 
 
 if __name__ == '__main__':
