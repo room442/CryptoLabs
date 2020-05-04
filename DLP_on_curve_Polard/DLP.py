@@ -26,15 +26,16 @@ if __name__ == '__main__':
     a_arr = []
     b_arr = []
     for j in range(L):
-        a = randint(1, q)
-        b = randint(1, q)
+        a = randint(1, q-1)
+        b = randint(1, q-1)
         a_arr.append(a)
         b_arr.append(b)
         Rs.append(add_mult(Px, Py, Qx, Qy, a, b, q, A))
 
-    a_ = randint(1, q)
-    b_ = randint(1, q)
-    T_x, T_y = add_mult(Px, Py, Qx, Qy, a_, b_, q, A)
+
+    a_ = randint(1, q-1)
+    b_ = randint(1, q-1)
+    T_x, T_y = add_mult(Px, Py, Qx, Qy, a_, b_, p, A)
     T__x, T__y = T_x, T_y
     a__, b__ = a_, b_
 
