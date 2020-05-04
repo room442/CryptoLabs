@@ -1,7 +1,3 @@
 from sage.all import *
+import curves_common as crv
 
-def test_mytest():
-    assert 4 == 4
-
-def test_secondTest():
-    assert 3 == 3
