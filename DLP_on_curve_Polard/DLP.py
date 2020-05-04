@@ -30,7 +30,7 @@ if __name__ == '__main__':
         b = randint(1, q-1)
         a_arr.append(a)
         b_arr.append(b)
-        Rs.append(add_mult(Px, Py, Qx, Qy, a, b, q, A))
+        Rs.append(add_mult(Px, Py, Qx, Qy, a, b, p, A))
 
 
     a_ = randint(1, q-1)
@@ -43,17 +43,17 @@ if __name__ == '__main__':
 
         # 5.1 -- one step
         j = T_x % L
-        T_x, T_y = crv.point_add(T_x, T_y, Rs[j][0], Rs[j][1], q, A)
+        T_x, T_y = crv.point_add(T_x, T_y, Rs[j][0], Rs[j][1], p, A)
         a_ = (a_ + a_arr[j]) % q
         b_ = (b_ + b_arr[j]) % q
 
         # 5.2 -- two steps
         j = T__x % L
-        T__x, T__y = crv.point_add(T__x, T__y, Rs[j][0], Rs[j][1], q, A)
+        T__x, T__y = crv.point_add(T__x, T__y, Rs[j][0], Rs[j][1], p, A)
         a__ = (a__ + a_arr[j]) % q
         b__ = (b__ + b_arr[j]) % q
         j = T__x % L
-        T__x, T__y = crv.point_add(T__x, T__y, Rs[j][0], Rs[j][1], q, A)
+        T__x, T__y = crv.point_add(T__x, T__y, Rs[j][0], Rs[j][1], p, A)
         a__ = (a__ + a_arr[j]) % q
         b__ = (b__ + b_arr[j]) % q
 
