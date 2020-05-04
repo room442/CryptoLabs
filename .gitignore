@@ -4,7 +4,8 @@ venv*
 venv_sagepy/
 .idea/
 __pycache__/
-GOST/pip_packages
+params.py
+*pip_packages*
 
 *.enc
 
