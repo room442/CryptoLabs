@@ -22,8 +22,8 @@ def get_args():
 
 def gen_factor(filename, bits):
 
-    p = randprime(2**(bits-1), 2**(bits))
-    q = randprime(2**(bits-1), 2**(bits))
+    p = randprime(2**(bits//2 - 1), 2**(bits//2))
+    q = randprime(2**(bits//2 - 1), 2**(bits//2))
     n = p*q
 
 

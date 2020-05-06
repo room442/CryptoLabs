@@ -57,7 +57,7 @@ def leinstra_point_add(x1, y1, x2, y2, p, A):
     if x1 == x2 and y1 == y2:
         return leinstra_point_double(x1, y1, p, A)
     if x1 == x2:
-        return 0, 1
+        return 0, 1, 1
     k = 1
     k = (((y2 - y1) % p) * modinv(((x2 - x1) % p), p)) % p
     x3 = (k ** 2 - x1 - x2) % p
@@ -69,9 +69,9 @@ def leinstra_point_mult(x, y, k, p, A):
     # as usual, but using leinstra_point_add, leinstra_point_double, and returns gcd of denom in k and p
     d = 1
     if k == 0:
-        return 0, 0
+        return 0, 0, 1
     if k == 1:
-        return x, y
+        return x, y, 1
     if k == 2:
         tmp = leinstra_point_double(x, y, p, A)
         return tmp[0], tmp[1], gcd(tmp[2], p)
@@ -80,35 +80,49 @@ def leinstra_point_mult(x, y, k, p, A):
     for bit in bin(k)[2:]:
         qx, qy, d = leinstra_point_double(qx, qy, p, A)
         if d != 1:
-            return qx, qy, d
+            return qx, qy, gcd(d, p)
         if bit == "1":
             qx, qy, d = leinstra_point_add(qx, qy, x, y, p, A)
             if d != 1:
-                return qx, qy, d
+                return qx, qy, gcd(d, p)
 
 
     return qx, qy, d
 
 
 def factor(n, primes):
-    Qx, Qy = randint(1, n-1), randint(1, n-1) # we can choose random curve, so there is no need for choosing curve
-                                              # and finding point, we can generate point and the curve
-    A = randint(1, n-1)
-    B = (Qy*Qy - Qx * Qx * Qx - A * Qx) % n
-    i = 0
-    Qix, Qiy = Qx, Qy
-    for p in primes:
-        ai = int(0.5 * log2(n)//log2(p))
-        for j in range(ai):
-            Qix, Qiy, d = leinstra_point_mult(Qix, Qiy, p, n, A)
-            if d != 1:
-                print(F"found d: {hex(d)}")
-                exit(0)
+    iter = 1
+    while True:
+        print(".", end="")
+        if iter%100 == 0:
+            print()
+        Qx, Qy = randint(1, n-1), randint(1, n-1) # we can choose random curve, so there is no need for choosing curve
+                                                  # and finding point, we can generate point and the curve
+        A = randint(1, n-1)
+        B = (Qy*Qy - Qx * Qx * Qx - A * Qx) % n
+        i = 0
+        Qix, Qiy = Qx, Qy
+        try:
+            for p in primes:
+                ai = int(0.5 * log2(n)//log2(p))
+                for j in range(ai):
+                    Qix, Qiy, d = leinstra_point_mult(Qix, Qiy, p, n, A)
+                    if d != 1:
+                        print(F"found d: {hex(d)}")
+                        exit(0)
+        except Exception as e:
+            _, g = e.args
+            return g
+        iter = iter+1
+
 
 
 
 
 if __name__ == '__main__':
     args = parse_args()
-    factor(N, get_primes(args.m))
+    start = time.time()
+    p = factor(N, get_primes(args.m))
+    end = time.time()
+    print(F"\nFound p: {hex(p)}, q: {hex(N//p)}, time: {end-start}s")
 
