@@ -1,8 +1,6 @@
 from pygost import gost34112012
 from random import randint
-from util import modinv
-from math import gcd
-from GOST.curves import *
+from curves_common import *
 
 
 def GOSTSignAdd(filename, d, p, A, B, m, q, xp, yp):
