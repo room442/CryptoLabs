@@ -57,7 +57,7 @@ def leinstra_point_add(x1, y1, x2, y2, p, A):
     if x1 == x2 and y1 == y2:
         return leinstra_point_double(x1, y1, p, A)
     if x1 == x2:
-        return 0, 1
+        return 0, 1, 1
     k = 1
     k = (((y2 - y1) % p) * modinv(((x2 - x1) % p), p)) % p
     x3 = (k ** 2 - x1 - x2) % p
@@ -69,9 +69,9 @@ def leinstra_point_mult(x, y, k, p, A):
     # as usual, but using leinstra_point_add, leinstra_point_double, and returns gcd of denom in k and p
     d = 1
     if k == 0:
-        return 0, 0
+        return 0, 0, 1
     if k == 1:
-        return x, y
+        return x, y, 1
     if k == 2:
         tmp = leinstra_point_double(x, y, p, A)
         return tmp[0], tmp[1], gcd(tmp[2], p)
@@ -80,11 +80,11 @@ def leinstra_point_mult(x, y, k, p, A):
     for bit in bin(k)[2:]:
         qx, qy, d = leinstra_point_double(qx, qy, p, A)
         if d != 1:
-            return qx, qy, d
+            return qx, qy, gcd(d, p)
         if bit == "1":
             qx, qy, d = leinstra_point_add(qx, qy, x, y, p, A)
             if d != 1:
-                return qx, qy, d
+                return qx, qy, gcd(d, p)
 
 
     return qx, qy, d
