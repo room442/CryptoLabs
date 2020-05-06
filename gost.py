@@ -43,32 +43,32 @@ def GOSTencodeSign(xq, yq, prime, A, B, xp, yp, q, r, s):
     encoder.write(b'\x80\x06\x07\x00', asn1.Numbers.OctetString)
     encoder.write(b'gostSignKey', asn1.Numbers.UTF8String)
 
-    encoder.enter(asn1.Numbers.Sequence)  # Open key
+    encoder.enter(asn1.Numbers.Sequence)  # Открытый ключ
     encoder.write(xq, asn1.Numbers.Integer)
     encoder.write(yq, asn1.Numbers.Integer)
     encoder.leave()
 
-    encoder.enter(asn1.Numbers.Sequence)  # cryptosystem params
+    encoder.enter(asn1.Numbers.Sequence)  # Параметры криптосистемы
 
-    encoder.enter(asn1.Numbers.Sequence)  # field params
+    encoder.enter(asn1.Numbers.Sequence)  # Параметры поля
     encoder.write(prime, asn1.Numbers.Integer)
     encoder.leave()
 
-    encoder.enter(asn1.Numbers.Sequence)  # curve params
+    encoder.enter(asn1.Numbers.Sequence)  # Параметры кривой
     encoder.write(A, asn1.Numbers.Integer)
     encoder.write(B, asn1.Numbers.Integer)
     encoder.leave()
 
-    encoder.enter(asn1.Numbers.Sequence)  # points generator
+    encoder.enter(asn1.Numbers.Sequence)  # Образующая группы точек
     encoder.write(xp, asn1.Numbers.Integer)
     encoder.write(yp, asn1.Numbers.Integer)
     encoder.leave()
 
-    encoder.write(q, asn1.Numbers.Integer)
+    encoder.write(q, asn1.Numbers.Integer) # Делитель порядка группы точек
 
     encoder.leave()
 
-    encoder.enter(asn1.Numbers.Sequence)  # sign
+    encoder.enter(asn1.Numbers.Sequence)  # Подпись
     encoder.write(r, asn1.Numbers.Integer)
     encoder.write(s, asn1.Numbers.Integer)
     encoder.leave()
@@ -77,7 +77,7 @@ def GOSTencodeSign(xq, yq, prime, A, B, xp, yp, q, r, s):
 
     encoder.leave()
 
-    encoder.enter(asn1.Numbers.Sequence)  # file params
+    encoder.enter(asn1.Numbers.Sequence)  # Параметры файла
     encoder.leave()
 
     encoder.leave()
@@ -86,7 +86,7 @@ def GOSTencodeSign(xq, yq, prime, A, B, xp, yp, q, r, s):
 
 
 def GOSTdecodeSign(filename):  # type: (filename) -> (xq, yq, prime, A, B, xp, yp, q, r, s)
-    integers = []  # list of integers in ASN.1 file
+    integers = []  # Целочисленные
     with open(filename, "rb") as file:
         data = file.read()
         decoder = asn1.Decoder()
