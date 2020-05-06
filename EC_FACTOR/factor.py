@@ -91,24 +91,38 @@ def leinstra_point_mult(x, y, k, p, A):
 
 
 def factor(n, primes):
-    Qx, Qy = randint(1, n-1), randint(1, n-1) # we can choose random curve, so there is no need for choosing curve
-                                              # and finding point, we can generate point and the curve
-    A = randint(1, n-1)
-    B = (Qy*Qy - Qx * Qx * Qx - A * Qx) % n
-    i = 0
-    Qix, Qiy = Qx, Qy
-    for p in primes:
-        ai = int(0.5 * log2(n)//log2(p))
-        for j in range(ai):
-            Qix, Qiy, d = leinstra_point_mult(Qix, Qiy, p, n, A)
-            if d != 1:
-                print(F"found d: {hex(d)}")
-                exit(0)
+    iter = 1
+    while True:
+        print(".", end="")
+        if iter%100 == 0:
+            print()
+        Qx, Qy = randint(1, n-1), randint(1, n-1) # we can choose random curve, so there is no need for choosing curve
+                                                  # and finding point, we can generate point and the curve
+        A = randint(1, n-1)
+        B = (Qy*Qy - Qx * Qx * Qx - A * Qx) % n
+        i = 0
+        Qix, Qiy = Qx, Qy
+        try:
+            for p in primes:
+                ai = int(0.5 * log2(n)//log2(p))
+                for j in range(ai):
+                    Qix, Qiy, d = leinstra_point_mult(Qix, Qiy, p, n, A)
+                    if d != 1:
+                        print(F"found d: {hex(d)}")
+                        exit(0)
+        except Exception as e:
+            _, g = e.args
+            return g
+        iter = iter+1
+
 
 
 
 
 if __name__ == '__main__':
     args = parse_args()
-    factor(N, get_primes(args.m))
+    start = time.time()
+    p = factor(N, get_primes(args.m))
+    end = time.time()
+    print(F"\nFound p: {hex(p)}, q: {hex(N//p)}, time: {end-start}s")
 
