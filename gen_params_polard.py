@@ -9,28 +9,21 @@ from sage.all import *
 # USES SAGE
 
 def get_args():
-    parser = argparse.ArgumentParser(description='Scheme install of DLP')
+    parser = argparse.ArgumentParser(description='Генерация параметров для алгоритма Поларда')
 
     parser.add_argument("BITS",
                         nargs="?",
                         type=auto_int,
                         default=32,
-                        help="Number of bits, default = 32")
+                        help="Биты, по умолчанию 32")
 
     parser.add_argument("-f",
-                        help="file to save")
+                        default="polard_params.py",
+                        help="Файл для сохранения параметров, по-умолчанию polad_params.py")
 
     return parser.parse_args()
 
-def gen_dlp(filename, bits):
-
-    # TODO: надо генерировать случайную точку P, простое число p -- характеристика поля, над котороым кривая
-    #       кривую (A, B), порядок q циклической подгруппы <P>, случайное значение d, Q
-
-    # FIXME: тут можно сделать так, чтобы не использовать sage, но тогда придется реализовывать
-    #        арифметику над полями полиномов. Смотри алгоритм Чуфа
-
-
+def gen_polard(filename, bits):
     p = randprime(2**bits, 2**(bits+1))
     A = randint(1, p)
     B = randint(1, p)
@@ -73,4 +66,4 @@ def gen_dlp(filename, bits):
 
 if __name__ == '__main__':
     args = get_args()
-    gen_dlp(args.f, args.BITS)
+    gen_polard(args.f, args.BITS)

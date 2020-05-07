@@ -1,7 +1,8 @@
-import DLP_on_curve_Polard.params as prm
+import polard_params as prm
 from random import randint
 import curves_common as crv
 from util import modinv
+from sage.all import *
 
 p = int(prm.p, 16)
 A = int(prm.A, 16)
@@ -12,6 +13,10 @@ q = int(prm.q, 16)
 # d = int(prm.d, 16)  # only for check
 Qx = int(prm.Qx, 16)
 Qy = int(prm.Qy, 16)
+
+E = EllipticCurve(GF(p), [A, B])
+P = E(Px, Py)
+Q = E(Qx, Qy)
 
 
 def add_mult(_Px, _Py, _Qx, _Qy, _a, _b, _p, _A):
@@ -30,38 +35,38 @@ if __name__ == '__main__':
         b = randint(1, q-1)
         a_arr.append(a)
         b_arr.append(b)
-        Rs.append(add_mult(Px, Py, Qx, Qy, a, b, p, A))
+        Rs.append(a*P + b*Q)
 
 
     a_ = randint(1, q-1)
     b_ = randint(1, q-1)
-    T_x, T_y = add_mult(Px, Py, Qx, Qy, a_, b_, p, A)
-    T__x, T__y = T_x, T_y
+    T_ = a_*P + b_*Q
+    T__ = T_
     a__, b__ = a_, b_
 
     while True:
 
-        # 5.1 -- one step
-        j = T_x % L
-        T_x, T_y = crv.point_add(T_x, T_y, Rs[j][0], Rs[j][1], p, A)
+        # 5.1
+        j = int(T_[0]) % L
+        T_ = T_ + Rs[j]
         a_ = (a_ + a_arr[j]) % q
         b_ = (b_ + b_arr[j]) % q
 
-        # 5.2 -- two steps
-        j = T__x % L
-        T__x, T__y = crv.point_add(T__x, T__y, Rs[j][0], Rs[j][1], p, A)
+        # 5.2
+        j = int(T__[0]) % L
+        T__ = T__ + Rs[j]
         a__ = (a__ + a_arr[j]) % q
         b__ = (b__ + b_arr[j]) % q
-        j = T__x % L
-        T__x, T__y = crv.point_add(T__x, T__y, Rs[j][0], Rs[j][1], p, A)
+        j = int(T__[0]) % L
+        T__ = T__ + Rs[j]
         a__ = (a__ + a_arr[j]) % q
         b__ = (b__ + b_arr[j]) % q
 
-        if T_x == T__x and T_y == T__y:
+        if T_ == T__:
             break
 
     if a_ == a__ and b_ == b__:
-        print("Sorry, try again.")
+        print("Не удалось разложить число, попробуйте заново")
         exit(-1)
     else:
         d = ((a_-a__) * modinv((b__ - b_)%q, q))%q
