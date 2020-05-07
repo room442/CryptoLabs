@@ -6,6 +6,14 @@ import asn1
 from sage.all import *
 
 
+A = int(gost_params.a, 10)
+B = int(gost_params.b, 10)
+p = int(gost_params.p, 10)
+q = int(gost_params.r, 10)
+x = int(gost_params.x, 10)
+y = int(gost_params.y, 10)
+
+
 def parse(decoder, integers):  # Функция разбора asn.1 файла, которая просто достает оттуда все числовые значения.
     while not decoder.eof():
         try:
@@ -31,7 +39,19 @@ def parse(decoder, integers):  # Функция разбора asn.1 файла,
     return integers  # возвращаем все целочисленные значения
 
 
-def GOSTencodeSign(xq, yq, prime, A, B, xp, yp, q, r, s):
+def GOSTencodeSign(Q, prime, A, B, P, q, r, s):
+
+    xq = int(Q[0])
+    yq = int(Q[1])
+    xp = int(P[0])
+    yp = int(P[1])
+    r = int(r)
+    s = int(s)
+    q = int(q)
+    prime = int(prime)
+
+
+
     encoder = asn1.Encoder()
 
     encoder.start()
@@ -95,7 +115,7 @@ def GOSTdecodeSign(filename):  # type: (filename) -> (xq, yq, prime, A, B, xp, y
     return integers
 
 
-def GOSTSignAdd(filename, d, p, A, B, m, q, xp, yp):
+def GOSTSignAdd(filename, d, q, P):
     with open(filename, "rb") as file:
         data = file.read()
 
@@ -105,11 +125,11 @@ def GOSTSignAdd(filename, d, p, A, B, m, q, xp, yp):
 
     while True:
         k = randint(0, q)
-        xc, yc = point_mult(xp, yp, k, p, A)
-        r = xc % q
+        C = k * P
+        r = C[0]
         if r == 0:
             continue
-        s = (r * d + k * e) % q
+        s = (r * d + k * e)
         if s == 0:
             continue
         break
@@ -117,7 +137,7 @@ def GOSTSignAdd(filename, d, p, A, B, m, q, xp, yp):
     return r, s
 
 
-def GOSTSignCheck(filename, xq, yq, p, A, B, m, q, xp, yp, r, s):
+def GOSTSignCheck(filename, Q, E, q, P, r, s):
     if r > q or r < 0 or s > q or s < 0:
         return False
 
@@ -129,30 +149,21 @@ def GOSTSignCheck(filename, xq, yq, p, A, B, m, q, xp, yp, r, s):
         e = 1
 
     v = inverse_mod(e, q)
-    z1 = (s * v) % q
-    z2 = (-1 * r * v) % q
 
-    xz1p, yz1p = point_mult(xp, yp, z1, p, A)
-    xz2q, yz2q = point_mult(xq, yq, z2, p, A)
-    xc, yc = point_add(xz1p, yz1p, xz2q, yz2q, p, A)
-    R = xc % q
+    C = ((s * v) % q) * P + ((-1 * r * v) % q) * Q
+    R = C[0]
 
     return r == R
 
 
-def GOSTgenKeys(p, A, B, m, q, xp, yp):
+def GOSTgenKeys(E, P):
     d = randint(1, q)
-    xq, yq = point_mult(xp, yp, d, p, A)
+    Q = d * P
 
-    return d, xq, yq
+    return d, Q
 
 
-A = int(gost_params.a, 10)
-B = int(gost_params.b, 10)
-p = int(gost_params.p, 10)
-q = int(gost_params.r, 10)
-x = int(gost_params.x, 10)
-y = int(gost_params.y, 10)
+
 
 
 def parse_args():
@@ -175,19 +186,45 @@ def parse_args():
 
 
 def GOSTfileSign(filename):
-    d, xq, yq = GOSTgenKeys(p, A, B, q, q, x, y)
-    r, s = GOSTSignAdd(filename, d, p, A, B, q, q, x, y)
+    E = EllipticCurve(GF(p), [A, B])
+    P = E(x, y)
+    d, Q = GOSTgenKeys(E, P)
+    r, s = GOSTSignAdd(filename, d, q, P)
+    print(F"Информация о подписи:\n"
+          F"E = {E}\n"
+          F"P = {P}\n"
+          F"d = {d}\n"
+          F"Q = {Q}\n"
+          F"dp = Q = {d*P}\n"
+          F"r = {r}\n"
+          F"s = {s}\n"
+          F"A, B = {A}, {B}\n"
+          F"p = {p}")
     with open(filename + ".sign", "wb") as file:
         file.write(
-            GOSTencodeSign(xq, yq, p, A, B, x, y, q, r, s)
+            GOSTencodeSign(Q, p, A, B, P, q, r, s)
         )
 
 
 def GOSTfileCheckSignature(filename, sig_filename):
     xq_decoded, yq_decoded, prime_decoded, A_decoded, B_decoded, xp_decoded, yp_decoded, q_decoded, r_decoded, s_decoded = GOSTdecodeSign(
         sig_filename)
-    return GOSTSignCheck(filename, xq_decoded, yq_decoded, prime_decoded, A_decoded, B_decoded, q_decoded, q_decoded,
-                         xp_decoded, yp_decoded, r_decoded, s_decoded)
+    E = EllipticCurve(GF(prime_decoded), [A_decoded, B_decoded])
+    P = E(xp_decoded, yp_decoded)
+    Q = E(xq_decoded, yq_decoded)
+
+    print(F"Информация о подписи:\n"
+          F"E = {E}\n"
+          F"P = {P}\n"
+          F"d -- неизвестно\n"
+          F"Q = {Q}\n"
+          F"dp -- неизвестно\n"
+          F"r = {r_decoded}\n"
+          F"s = {s_decoded}\n"
+          F"A, B = {A_decoded}, {B_decoded}\n"
+          F"p = {prime_decoded}")
+
+    return GOSTSignCheck(filename, Q, E, q_decoded, P, r_decoded, s_decoded)
 
 
 if __name__ == '__main__':
@@ -204,5 +241,5 @@ if __name__ == '__main__':
             else:
                 result = GOSTfileCheckSignature(args.FILE, args.sfile)
             print("Sign check: " + str(result))
-    except NameError:
-        print("Какая-то ошибка, скорее всего в параметрах.")
+    except NameError as e:
+        print(F"Какая-то ошибка, скорее всего в параметрах. Вот ошибка: {e}")
