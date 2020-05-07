@@ -129,7 +129,7 @@ def GOSTSignAdd(filename, d, q, P):
         r = C[0]
         if r == 0:
             continue
-        s = (r * d + k * e)
+        s = (int(r) * int(d) + int(k) * int(e)) % q
         if s == 0:
             continue
         break
@@ -151,7 +151,7 @@ def GOSTSignCheck(filename, Q, E, q, P, r, s):
     v = inverse_mod(e, q)
 
     C = ((s * v) % q) * P + ((-1 * r * v) % q) * Q
-    R = C[0]
+    R = int(C[0])%q
 
     return r == R
 
