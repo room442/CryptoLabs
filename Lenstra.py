@@ -1,10 +1,9 @@
 import time
-from sympy import nextprime, gcd  # you can implement this function by yours hand and miller-rabin algo
-from params import n
+from lenstra_params import n
 import argparse
 from random import randint
 from math import log2
-import curves_common as crv
+from sage.all import *
 
 N = int(n, 16)
 
@@ -19,21 +18,10 @@ def parse_args():
 
 
 def get_primes(n):
-    primes = []
-    print(F"Generating {n} primes")
-    with open("primes.txt", "r") as f:
-        print("Open file, reading")
-        start = time.time()
-        p = 0
-        for line in f:
-            primes.append(int(line))
-            p = p + 1
-            if p >= n:
-                break
-        print(F"Close file, time = {time.time() - start}")
+    primes = [2]
 
     while len(primes) < n:
-        primes.append(nextprime(primes[-1]))
+        primes.append(next_prime(n))
 
     return primes
 
@@ -41,9 +29,7 @@ def get_primes(n):
 def factor(n, primes):
     iter = 1
     while True:
-        print(".", end="")
-        if iter % 100 == 0:
-            print()
+
         Qx, Qy = randint(1, n - 1), randint(1,n - 1)  # we can choose random curve, so there is no need for choosing curve
                                                       # and finding point, we can generate point and the curve
         A = randint(1, n - 1)

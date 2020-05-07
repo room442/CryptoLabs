@@ -1,29 +1,27 @@
-import curves_common as crv
 import argparse
 from util import auto_int
-from sympy import randprime
-from random import randint
+from sage.all import random_prime
 
-# USES SAGE
 
 def get_args():
-    parser = argparse.ArgumentParser(description='Scheme install of factorization tool')
+    parser = argparse.ArgumentParser(description='Генерация параметров для алгоритма Леинстры')
 
     parser.add_argument("BITS",
                         nargs="?",
                         type=auto_int,
                         default=32,
-                        help="Number of bits, default = 32")
+                        help="Биты, по умолчанию 32")
 
     parser.add_argument("-f",
-                        help="file to save")
+                        default="lenstra_params.py",
+                        help="Файл для сохранения, по умолчанию lenstra_params.py")
 
     return parser.parse_args()
 
 def gen_factor(filename, bits):
 
-    p = randprime(2**(bits//2 - 1), 2**(bits//2))
-    q = randprime(2**(bits//2 - 1), 2**(bits//2))
+    p = random_prime(2**(bits//2 - 1), 2**(bits//2))
+    q = random_prime(2**(bits//2 - 1), 2**(bits//2))
     n = p*q
 
 
