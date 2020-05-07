@@ -6,8 +6,6 @@ from random import randint
 from sage.all import *
 
 
-# USES SAGE
-
 def get_args():
     parser = argparse.ArgumentParser(description='Генерация параметров для алгоритма Поларда')
 
@@ -38,15 +36,6 @@ def gen_polard(filename, bits):
     d = randint(1, q)
     Q = d*P
 
-    # print(F"p = {p}")
-    # print(F"A = {A}")
-    # print(F"B = {B}")
-    # # print(F"#E = {orders}")
-    # # print(F"q*P = {q*P}, (q-1)P = {(q-1)*P}")
-    # print(P)
-    # print(q)
-    # print(d)
-    # print(Q)
 
     mystr = F"p = \"{hex(p)[2:]}\"\n" \
             F"A = \"{hex(A)[2:]}\"\n" \
