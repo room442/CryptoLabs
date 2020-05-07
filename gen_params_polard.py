@@ -1,4 +1,3 @@
-import curves_common as crv
 import argparse
 from util import auto_int
 from sympy import randprime

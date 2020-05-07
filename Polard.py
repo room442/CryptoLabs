@@ -1,6 +1,5 @@
 import polard_params as prm
 from random import randint
-import curves_common as crv
 from util import modinv
 from sage.all import *
 
@@ -18,11 +17,6 @@ E = EllipticCurve(GF(p), [A, B])
 P = E(Px, Py)
 Q = E(Qx, Qy)
 
-
-def add_mult(_Px, _Py, _Qx, _Qy, _a, _b, _p, _A):
-    aPx, aPy = crv.point_mult(_Px, _Py, _a, _p, _A)
-    bQx, bQy = crv.point_mult(_Qx, _Qy, _b, _p, _A)
-    return crv.point_add(aPx, aPy, bQx, bQy, _p, _A)
 
 
 if __name__ == '__main__':
