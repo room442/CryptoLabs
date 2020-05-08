@@ -45,6 +45,8 @@ def GOSTencodeSign(Q, prime, A, B, P, q, r, s):
     yq = int(Q[1])
     xp = int(P[0])
     yp = int(P[1])
+    a = int(A)
+    b = int(B)
     r = int(r)
     s = int(s)
     q = int(q)
@@ -75,8 +77,8 @@ def GOSTencodeSign(Q, prime, A, B, P, q, r, s):
     encoder.leave()
 
     encoder.enter(asn1.Numbers.Sequence)  # Параметры кривой
-    encoder.write(A, asn1.Numbers.Integer)
-    encoder.write(B, asn1.Numbers.Integer)
+    encoder.write(a, asn1.Numbers.Integer)
+    encoder.write(b, asn1.Numbers.Integer)
     encoder.leave()
 
     encoder.enter(asn1.Numbers.Sequence)  # Образующая группы точек
@@ -126,7 +128,7 @@ def GOSTSignAdd(filename, d, q, P):
     while True:
         k = randint(0, q)
         C = k * P
-        r = C[0]
+        r = int(C[0]) % q
         if r == 0:
             continue
         s = (int(r) * int(d) + int(k) * int(e)) % q
@@ -138,7 +140,17 @@ def GOSTSignAdd(filename, d, q, P):
 
 
 def GOSTSignCheck(filename, Q, E, q, P, r, s):
-    if r > q or r < 0 or s > q or s < 0:
+    if r > q:
+        print("r > q")
+        return False
+    if r < 0:
+        print("r < 0")
+        return Fasle
+    if s > q:
+        print("s > q")
+        return False
+    if s < 0:
+        print("s < 0")
         return False
 
     with open(filename, "rb") as file:
@@ -199,7 +211,8 @@ def GOSTfileSign(filename):
           F"r = {r}\n"
           F"s = {s}\n"
           F"A, B = {A}, {B}\n"
-          F"p = {p}")
+          F"p = {p}\n"
+          F"q = {q}")
     with open(filename + ".sign", "wb") as file:
         file.write(
             GOSTencodeSign(Q, p, A, B, P, q, r, s)
@@ -222,12 +235,13 @@ def GOSTfileCheckSignature(filename, sig_filename):
           F"r = {r_decoded}\n"
           F"s = {s_decoded}\n"
           F"A, B = {A_decoded}, {B_decoded}\n"
-          F"p = {prime_decoded}")
+          F"p = {prime_decoded}\n"
+          F"q = {q}")
 
     return GOSTSignCheck(filename, Q, E, q_decoded, P, r_decoded, s_decoded)
 
 
-if __name__ == '__main__':
+def main():
     args = parse_args()
     try:
         if args.sign:
@@ -243,3 +257,7 @@ if __name__ == '__main__':
             print("Sign check: " + str(result))
     except NameError as e:
         print(F"Какая-то ошибка, скорее всего в параметрах. Вот ошибка: {e}")
+
+
+if __name__ == '__main__':
+    main()
