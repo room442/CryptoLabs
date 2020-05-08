@@ -20,6 +20,7 @@ def ELGSignAdd(filename, x, a, p, r):
         data = file.read()
 
     m = int(sha256(data).hexdigest(), 16) % r
+    print(F"Hash: {sha256(data).hexdigest()}")
     k = gen_k(r)
     w = pow(a, k, p)
     s = ((m - (x * w) % r) * mod_inverse(k, r)) % r
