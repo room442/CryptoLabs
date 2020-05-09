@@ -1,9 +1,8 @@
 import argparse
 from util import auto_int, modinv
-from sympy import isprime
 from random import randint
 from math import gcd
-from RSA.factor_vuln_params import n, e, d
+from CM.RSA.factor_vuln_params import n, e, d
 
 
 def parse_args():

@@ -1,6 +1,6 @@
 import argparse
-from MO.params import *
-from MO import mo_client, mo_server
+from CM.MO.params import *
+from CM.MO import mo_server, mo_client
 from multiprocessing import Process
 import time
 

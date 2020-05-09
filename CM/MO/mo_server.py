@@ -1,5 +1,5 @@
-from MO.asn import MOdecodeParams, MOencodeResponse, MOdecodeFinish
-from MO.crypto import MOencrypt, MOdecrypt, MOgetKeys
+from CM.MO.asn import MOdecodeParams, MOencodeResponse, MOdecodeFinish
+from CM.MO.crypto import MOencrypt, MOdecrypt, MOgetKeys
 from aes_common import AES256decrypt, AES
 import socket
 import os

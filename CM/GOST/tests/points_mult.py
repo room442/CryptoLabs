@@ -1,6 +1,6 @@
 import curves_common as crv
 from sage.all import *
-import GOST.params as prm
+import CM.GOST.params as prm
 from random import randint
 
 a = int(prm.a, 10)
