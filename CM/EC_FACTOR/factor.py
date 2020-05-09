@@ -1,6 +1,6 @@
 import time
-from sympy import nextprime, gcd  # you can implement this function by yours hand and miller-rabin algo
-from EC_FACTOR.params import n
+from sympy import nextprime  # you can implement this function by yours hand and miller-rabin algo
+from CM.EC_FACTOR.params import n
 import argparse
 from random import randint
 from math import log2

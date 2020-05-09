@@ -1,11 +1,8 @@
 import argparse
-from util import auto_int
-from RSA.special_vuln_params import *
-from RSA.crypto import RSAencrypt, RSAdecrypt
+from CM.RSA.special_vuln_params import *
+from CM.RSA.crypto import RSAencrypt
 from sympy.ntheory.modular import crt
 from decimal import Decimal
-from aes_common import AES
-from Crypto.Random import get_random_bytes
 
 '''
 Will use file special_vuln_params.py
