@@ -15,7 +15,36 @@
 
 # my plan
 # TODO:
-#   - Lattice arithmetic
+#   - Lattice arithmetic (matrix?)
 #   - Output in guman way
 #   - Vector arithmetic
 #   -
+
+
+def matrix_mult(a, b):
+    m = len(a)
+    n = len(b[0])
+    p = len(a[0])
+    result = [[0] * n] * m
+    for i in range(m):
+        for j in range(n):
+            cell = 0
+            for k in range(p):
+                cell += a[i][k] * b[k][j]
+            result[i][j] = cell
+
+    return result
+
+
+def scalar_prod(a, b):
+    result = 0
+    for i in range(len(a)):
+        result += a[i] * b[i]
+
+    return result
+
+
+
+
+if __name__ == '__main__':
+    print("hello")
