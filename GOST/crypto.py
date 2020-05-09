@@ -7,7 +7,9 @@ def GOSTSignAdd(filename, d, p, A, B, m, q, xp, yp):
     with open(filename, "rb") as file:
         data = file.read()
 
-    e = int(gost34112012.GOST34112012(data).hexdigest(), 16) % q
+    h = gost34112012.GOST34112012(data).hexdigest()
+    print(F"Hash: {h}")
+    e = int(h, 16) % q
     if e == 0:
         e = 1
 
@@ -32,7 +34,9 @@ def GOSTSignCheck(filename, xq, yq, p, A, B, m, q, xp, yp, r, s):
     with open(filename, "rb") as file:
         data = file.read()
 
-    e = int(gost34112012.GOST34112012(data).hexdigest(), 16) % q
+    h = gost34112012.GOST34112012(data).hexdigest()
+    print(F"Hash: {h}")
+    e = int(h, 16) % q
     if e == 0:
         e = 1
 
