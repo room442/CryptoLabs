@@ -1,11 +1,26 @@
-My lab, that implements RSA encryption.
+# Cryptolabs
 
-`schemeinstal.py BITS -f filename` — print scheme params to filename, but `main.py` reads only from `params.py`
+This repo contains labs of some cryptographic courses in my university — Peter the Great Saint-Petersburg polytechnic university.
 
-`main.py -e filename` — encrypting, output to filename.enc 
+## Structure
 
-`main.py -d filename` — decrypting, output to filename.dec
+### CM
 
-`main.py -s filename` — sign filename, output to filename.sign
+This directory contains labs of cryptographic methods of information defense.
 
-`main.py -c filename --sfile sign` — check sign of the filename, given by `--sfile`
+### FA
+
+This directory contains labs of fast computing algorithms.
+
+### .run
+
+This directory contains PyCharm configs for running, but you can also run any lab from any Python interpreter. Check readme in directories or use -h flag.
+
+### dumpasn1
+
+This directory contains dumpasn1 util for dumping asn1 structure.
+
+### root 
+
+In the root directory placed some common files, as .gitignore and README.md, but also some common files, that used in more then one lab. 
+
