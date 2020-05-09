@@ -44,6 +44,7 @@ def GOSTfileCheckSignature(filename, sig_filename):
     return GOSTSignCheck(filename, xq_decoded, yq_decoded, prime_decoded, A_decoded, B_decoded, q_decoded, q_decoded, xp_decoded, yp_decoded, r_decoded, s_decoded)
 
 if __name__ == '__main__':
+    print(F"Run {GOST.params.alias}")
     args = parse_args()
     try:
         if args.sign:
