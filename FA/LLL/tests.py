@@ -2,24 +2,24 @@ import pytest
 from FA.LLL.LLL import *
 
 
-def test_scalar_prod():
-    a = [-3, 5, 2]
-    b = [1, -7, 2]
-    result = 32
-    assert scalar_prod(a, b) == result
+class TestScalarProdCase:
+    def setup(self):
+        self.a = [-3, 5, 2]
+        self.b = [1, -7, 3]
+        self.result = -32
 
+    def test_scalar_product(self):
+        result = scalar_prod(self.a, self.b)
+        assert self.result == result
 
-def test_norm2l():
-    v = [5, -1]
-    result = 26
-    assert norml2(v) == result
+class TestNorml2Case:
+    def setup(self):
+        self.norml2_vector = [ 5, -1]
+        self.norml2_result = 26
 
-
-def test_matrix_mult():
-    a = [[5, 3, 2], [1, 5, 6]]
-    b = [[2, 4], [1, 7], [3, 2]]
-    result = [[19, 45], [25, 51]]
-    assert matrix_mult(a, b) == result
+    def test_norml2(self):
+        res = norml2(self.norml2_vector)
+        assert self.norml2_result == res
 
 
 class TestMatrixCase:
@@ -27,25 +27,30 @@ class TestMatrixCase:
     def setup(self):
         self.a = [[5, 3, 2], [1, 5, 6]]
         self.b = [[2, 4], [1, 7], [3, 2]]
+        self.result = [[19, 45], [25, 51]]
         self.v0 = [[1, 3, 2], [3, 5, 6]]
         self.v1 = [[5, 1, 2], [1, 3, 6]]
         self.v2 = [[5, 3, 1], [1, 5, 3]]
 
+    def test_matrix_mult(self):
+        result = matrix_mult(self.a, self.b)
+        assert result == self.result
+
     def test_set_matrix_vector_0(self):
         aa = self.a
         set_matrix_vector(aa, 0, [1, 3])
-        assert self.v0 == aa
+        assert aa == self.v0
 
     def test_set_matrix_vector_1(self):
         aa = self.a
         set_matrix_vector(aa, 1, [1, 3])
-        assert self.v1 == aa
+        assert aa == self.v1
 
     def test_set_matrix_vector_2(self):
         aa = self.a
         v = [[5, 3, 1], [1, 5, 3]]
         set_matrix_vector(aa, 2, [1, 3])
-        assert self.v2 == aa
+        assert aa == self.v2
 
 
 class TestVectorCase:
@@ -62,27 +67,27 @@ class TestVectorCase:
 
     def test_get_vector_0(self):
         vector0 = get_vector(self.n, 0)
-        assert self.vector0 == vector0
+        assert vector0 == self.vector0
 
     def test_get_vector_1(self):
         vector1 = get_vector(self.n, 1)
-        assert self.vector1 == vector1
+        assert vector1 == self.vector1
 
     def test_get_vector_2(self):
         vector2 = get_vector(self.n, 2)
-        assert self.vector2 == vector2
+        assert vector2 == self.vector2
 
     def test_vector_add(self):
         res = vector_add(self.vector0, self.vector1)
-        assert self.vector_add == res
+        assert res == self.vector_add
 
     def test_vector_sub(self):
         res = vector_sub(self.vector0, self.vector1)
-        assert self.vector_sub == res
+        assert res == self.vector_sub
 
     def test_vector_mult_const(self):
         res = vector_mult_const(self.vector0, 3)
-        assert self.vector_mult_const == res
+        assert res == self.vector_mult_const
 
 
 class TestKnapsackCase:
@@ -97,12 +102,13 @@ class TestKnapsackCase:
 
     def test_create_matrix_from_knapsack(self):
         res = create_matrix_from_knapsack(self.knapsack, self.the_sum)
-        assert self.knapsack_result == res
+        assert res == self.knapsack_result
 
     def test_best_vector(self):
         m = create_matrix(self.knap_best_vector_n)
         res = best_vect_knapsack(m)
-        assert self.knap_best_vector == res
+        assert res == self.knap_best_vector
+
 
 class TestUtilCase:
     def setup(self):
@@ -114,11 +120,12 @@ class TestUtilCase:
 
     def test_round_pos(self):
         res = round(self.round_pos)
-        assert self.round_neg_res == res
+        assert res == self.round_neg_res
 
     def test_round_neg(self):
         res = round(self.round_neg)
-        assert self.round_neg_res == res
+        assert res == self.round_neg_res
+
 
 class TestLLLCase:
     def setup(self):
@@ -146,55 +153,55 @@ class TestLLLCase:
         B = [0, 0]
 
         gram_schmidt(self.mat_gram_schmidt, m, mu, B)
-        assert self.mat_gram_schmidt_res == m
+        assert m == self.mat_gram_schmidt_res
 
     def test_lll_reduction_wikipedia(self):
         mat = create_matrix(self.wikipedia_example)
         mat_reduced = lll_reduction(mat)
-        assert self.wikipedia_example_reduced == mat_reduced
+        assert mat_reduced == self.wikipedia_example_reduced
 
     def test_is_non_lll_wikipedia(self):
         mat = create_matrix(self.wikipedia_example)
-        assert 0 == islll(mat)
+        assert islll(mat) == 0
 
     def test_is_lll_wikipedia(self):
         mat = create_matrix(self.wikipedia_example)
         mat_reduced = lll_reduction(mat)
-        assert 1 == islll(mat_reduced)
+        assert islll(mat_reduced) == 1
 
     def test_lll_reduction_1(self):
         mat = create_matrix(self.mat_reduction_1)
         mat_reduced = lll_reduction(mat)
-        assert self.mat_reduction_1_reduced == mat_reduced
+        assert mat_reduced == self.mat_reduction_1_reduced
 
     def test_lll_reduction_2(self):
         mat = create_matrix(self.mat_reduction_2)
         mat_reduced = lll_reduction(mat)
-        assert self.mat_reduction_2_reduced == mat_reduced
+        assert mat_reduced == self.mat_reduction_2_reduced
 
     def test_lll_reduction_3(self):
         mat = create_matrix(self.mat_reduction_3)
         mat_reduced = lll_reduction(mat)
-        assert self.mat_reduction_3_reduced == mat_reduced
+        assert mat_reduced == self.mat_reduction_3_reduced
 
     def test_lll_reduction_knapsack1(self):
         first_mat = create_matrix_from_knapsack(self.pubkey, self.first_sum)
-        assert 0 == islll(first_mat)
+        assert islll(first_mat) == 0
         first_mat_reduced = lll_reduction(first_mat)
-        assert 1 == islll(first_mat_reduced)
+        assert islll(first_mat_reduced) == 1
         res = best_vect_knapsack(first_mat_reduced)
-        assert self.best_vect_first_sum == res
+        assert res == self.best_vect_first_sum
 
     def test_lll_reduction_knapsack2(self):
         second_mat = create_matrix_from_knapsack(self.pubkey, self.second_sum)
-        assert 0 == islll(second_mat)
+        assert islll(second_mat) == 0
         second_mat_reduced = lll_reduction(second_mat)
-        assert 1 == islll(second_mat_reduced)
+        assert islll(second_mat_reduced) == 1
         res = best_vect_knapsack(second_mat_reduced)
-        assert self.best_vect_second_sum == res
+        assert res == self.best_vect_second_sum
 
     def test_lll_reduction_not_full_rank(self):
         basis = create_matrix(self.not_full_rank)
         expected_reduced_basis = create_matrix(self.not_full_rank_reduced)
         reduced_basis = lll_reduction(basis)
-        assert expected_reduced_basis == reduced_basis
+        assert reduced_basis == expected_reduced_basis
