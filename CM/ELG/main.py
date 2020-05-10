@@ -1,17 +1,10 @@
-from GOST.asn import *
-import GOST.params
-from GOST.crypto import *
+import asn_common
+import aes_common
 import argparse
-
-A = int(GOST.params.a, 10)
-B = int(GOST.params.b, 10)
-p = int(GOST.params.p, 10)
-q = int(GOST.params.r, 10)
-x = int(GOST.params.x, 10)
-y = int(GOST.params.y, 10)
+from CM.ELG.params import *
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='GOST digital signature generator')
+    parser = argparse.ArgumentParser(description='ELG digital signature generator')
     parser.add_argument("FILE",
                         help="Name of input file")
 
@@ -31,24 +24,45 @@ def parse_args():
     return parser.parse_args()
 
 
-def GOSTfileSign(filename):
-    d, xq, yq = GOSTgenKeys(p, A, B, q, q, x, y)
-    r, s = GOSTSignAdd(filename, d, p, A, B, q, q, x, y)
+def ELGfileSign(filename):
+    w, s = aes_common.ELGSignAdd(
+        filename,
+        int(x, 16),
+        int(a, 16),
+        int(p, 16),
+        int(r, 16)
+    )
     with open(filename + ".sign", "wb") as file:
         file.write(
-            GOSTencodeSign(xq, yq, p, A, B, x, y, q, r, s)
+            asn_common.ELGencodeSign(
+                int(p, 16),
+                int(r, 16),
+                int(a, 16),
+                w,
+                s,
+                int(b, 16)
+            )
         )
 
-def GOSTfileCheckSignature(filename, sig_filename):
-    xq_decoded, yq_decoded, prime_decoded, A_decoded, B_decoded, xp_decoded, yp_decoded, q_decoded, r_decoded, s_decoded = GOSTdecodeSign(sig_filename)
-    return GOSTSignCheck(filename, xq_decoded, yq_decoded, prime_decoded, A_decoded, B_decoded, q_decoded, q_decoded, xp_decoded, yp_decoded, r_decoded, s_decoded)
+def ELGfileCheckSignature(filename, sig_filename):
+    b, p, r, a, w, s = asn_common.ELGdecodeSign(sig_filename)
+
+    return aes_common.ELGSignCheck(
+        filename,
+        a,
+        b,
+        p,
+        r,
+        w,
+        s
+    )
+
 
 if __name__ == '__main__':
-    print(F"Run {GOST.params.alias}")
     args = parse_args()
     try:
         if args.sign:
-            GOSTfileSign(args.FILE)
+            ELGfileSign(args.FILE)
             print("Signing complete")
 
         if args.check:
@@ -56,7 +70,7 @@ if __name__ == '__main__':
                 print("You should give the signature file by --sfile command")
                 exit(1)
             else:
-                result = GOSTfileCheckSignature(args.FILE, args.sfile)
+                result = ELGfileCheckSignature(args.FILE, args.sfile)
             print("Sign check: " + str(result))
     except NameError:
         print("Error with names of varaibles, please, check params.py or re-generete it with schemeinstall.py")
