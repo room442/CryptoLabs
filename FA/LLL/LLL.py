@@ -100,7 +100,7 @@ def create_matrix_from_knapsack(knap, the_sum):
             if i == j:
                 result[i][j] = 1
 
-    i = n + 1
+    i = i + 1
     for k in range(n):
         result[i][k] = knap[k]
 
