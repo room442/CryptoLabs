@@ -21,6 +21,9 @@
 #   -
 
 
+#TODO: надо вернуться к Fraction, по крайней мере чтобы проверить, что проблема не в ошибке округления.
+
+
 def matrix_mult(a, b):
     m = len(a)
     n = len(b[0])
@@ -251,7 +254,7 @@ def lll_reduction(n, lc=3/4):
     # k = 2
     k = 1
 
-    while 1:
+    while True:
 
         # 1 - perform (*) for l = k - 1
         reduce(g, mu, k, k - 1)
