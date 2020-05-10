@@ -25,7 +25,7 @@ def matrix_mult(a, b):
     m = len(a)
     n = len(b[0])
     p = len(a[0])
-    result = [[0] * n] * m
+    result = [[0 for _ in range(n)] for _ in range(m)]
     for i in range(m):
         for j in range(n):
             cell = 0
@@ -93,7 +93,7 @@ def norml2(a):
 
 def create_matrix_from_knapsack(knap, the_sum):
     n = len(knap)
-    result = [[0] * (n + 1)] * (n + 1)
+    result = [[0 for _ in range(n + 1)] for _ in range(n + 1)]
 
     for i in range(n):
         for j in range(n):
@@ -241,10 +241,10 @@ def lll_reduction(n, lc=3/4):
     row = len(n)
     col = len(n[0])
 
-    m = [[0] * col] * row
-    mu = [[0] * col] * col
+    m = [[0 for _ in range(col)] for _ in range(row)]
+    mu = [[0 for _ in range(col)] for _ in range(col)]
     g = [[n[i][j] for j in range(col)] for i in range(row)]
-    B = [0] * col
+    B = [0 for _ in range(col)]
 
     gram_schmidt(g, m, mu, B)
 
@@ -309,9 +309,9 @@ def islll(n, lc=3 / 4):
     row = len(n)
     col = len(n[0])
 
-    m = [[0] * col] * row
-    mu = [[0] * col] * col
-    B = [0] * col
+    m = [[0 for _ in range(col)] for _ in range(row)]
+    mu = [[0 for _ in range(col)] for _ in range(col)]
+    B = [0 for _ in range(col)]
 
     gram_schmidt(n, m, mu, B)
 
@@ -328,5 +328,3 @@ def islll(n, lc=3 / 4):
 
 if __name__ == '__main__':
     print("hello")
-    print_vector([1, 2, 3])
-    print_matrix([[111, 222, 333], [1, 2, 3], [9999, 999999, 0]])
