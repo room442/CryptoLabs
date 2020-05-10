@@ -1,0 +1,200 @@
+import pytest
+from FA.LLL.LLL import *
+
+
+def test_scalar_prod():
+    a = [-3, 5, 2]
+    b = [1, -7, 2]
+    result = 32
+    assert scalar_prod(a, b) == result
+
+
+def test_norm2l():
+    v = [5, -1]
+    result = 26
+    assert norml2(v) == result
+
+
+def test_matrix_mult():
+    a = [[5, 3, 2], [1, 5, 6]]
+    b = [[2, 4], [1, 7], [3, 2]]
+    result = [[19, 45], [25, 51]]
+    assert matrix_mult(a, b) == result
+
+
+class TestMatrixCase:
+
+    def setup(self):
+        self.a = [[5, 3, 2], [1, 5, 6]]
+        self.b = [[2, 4], [1, 7], [3, 2]]
+        self.v0 = [[1, 3, 2], [3, 5, 6]]
+        self.v1 = [[5, 1, 2], [1, 3, 6]]
+        self.v2 = [[5, 3, 1], [1, 5, 3]]
+
+    def test_set_matrix_vector_0(self):
+        aa = self.a
+        set_matrix_vector(aa, 0, [1, 3])
+        assert self.v0 == aa
+
+    def test_set_matrix_vector_1(self):
+        aa = self.a
+        set_matrix_vector(aa, 1, [1, 3])
+        assert self.v1 == aa
+
+    def test_set_matrix_vector_2(self):
+        aa = self.a
+        v = [[5, 3, 1], [1, 5, 3]]
+        set_matrix_vector(aa, 2, [1, 3])
+        assert self.v2 == aa
+
+
+class TestVectorCase:
+    def setup(self):
+        self.n = [[5, 3, 2], [1, 5, 6]]
+        self.vector0 = [5, 1]
+        self.vector1 = [3, 5]
+        self.vector2 = [2, 6]
+        self.vector_add = [8, 6]
+        self.vector_sub = [2, -4]
+        self.vector_mult_const = [15, 3]
+        self.norml2_vector = [5, -1]
+        self.norml2_result = 26
+
+    def test_get_vector_0(self):
+        vector0 = get_vector(self.n, 0)
+        assert self.vector0 == vector0
+
+    def test_get_vector_1(self):
+        vector1 = get_vector(self.n, 1)
+        assert self.vector1 == vector1
+
+    def test_get_vector_2(self):
+        vector2 = get_vector(self.n, 2)
+        assert self.vector2 == vector2
+
+    def test_vector_add(self):
+        res = vector_add(self.vector0, self.vector1)
+        assert self.vector_add == res
+
+    def test_vector_sub(self):
+        res = vector_sub(self.vector0, self.vector1)
+        assert self.vector_sub == res
+
+    def test_vector_mult_const(self):
+        res = vector_mult_const(self.vector0, 3)
+        assert self.vector_mult_const == res
+
+
+class TestKnapsackCase:
+    def setup(self):
+        self.knapsack = [17, 8, 10, 14, 3]
+        self.the_sum = 30
+        self.knapsack_result = [[1, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 0],
+                                [0, 0, 0, 0, 1, 0], [17, 8, 10, 14, 3, -30]]
+        self.knap_best_vector_n = [[1, -1, -5, 3, -3], [0, -1, 0, -12, 4], [0, -1, 7, 1, -11], [1, 1, 5, -4, 2],
+                                   [0, 1, -3, -2, -14]]
+        self.knap_best_vector = [1, 0, 0, 1]
+
+    def test_create_matrix_from_knapsack(self):
+        res = create_matrix_from_knapsack(self.knapsack, self.the_sum)
+        assert self.knapsack_result == res
+
+    def test_best_vector(self):
+        m = create_matrix(self.knap_best_vector_n)
+        res = best_vect_knapsack(m)
+        assert self.knap_best_vector == res
+
+class TestUtilCase:
+    def setup(self):
+        self.round_pos = 7/2
+        self.round_pos_res = 4
+
+        self.round_neg = -3/2
+        self.round_neg_res = -2
+
+    def test_round_pos(self):
+        res = round(self.round_pos)
+        assert self.round_neg_res == res
+
+    def test_round_neg(self):
+        res = round(self.round_neg)
+        assert self.round_neg_res == res
+
+class TestLLLCase:
+    def setup(self):
+        self.mat_gram_schmidt = [[1, 1], [0, 1]]
+        self.mat_gram_schmidt_res = [[1, 0], [0, 1]]
+        self.wikipedia_example = [[1, -1, 3], [1, 0, 5], [1, 2, 6]]
+        self.wikipedia_example_reduced = [[0, 1, -1], [1, 0, 0], [0, 1, 2]]
+        self.mat_reduction_1 = [[10, 11], [11, 12]]
+        self.mat_reduction_1_reduced = [[-1, 0], [0, 1]]
+        self.mat_reduction_2 = [[2, 3], [0, 1]]
+        self.mat_reduction_2_reduced = [[-1, 1], [1, 1]]
+        self.mat_reduction_3 = [[1, -1], [-1, 2]]
+        self.mat_reduction_3_reduced = [[1, 0], [0, -1]]
+        self.pubkey = [964266105338945, 6749864515101946, 964264861986975, 13499727318176232, 17356789956975810,3857053002628327, 12535438500695219, 10606879723866753, 10606828405887831, 16392324024362666, 13499318722439347, 7713307812454905, 6748217527825207, 6746569486347068, 8671806553725916, 2879615947706164, 18294696345811439, 6697131932913639, 15322796985338016, 753333165640954, 16934930158297044, 10727464396496856, 8919464717468072, 12053330796850461]
+        self.first_sum = 85665597416613316
+        self.second_sum = 68924182376697138
+        self.best_vect_first_sum = [0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0]
+        self.best_vect_second_sum = [0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]
+        self.not_full_rank = [ [ 0, 17, 1], [10, 100, 80], [-9, 11, 76], [110, 50, 60]]
+        self.not_full_rank_reduced = [ [ -16, 0, 17], [-20, 10, 90], [65, -9, 20], [10, 110, -60]]
+
+    def test_gram_schmidt(self):
+        mu = [[0, 0], [0, 0]]
+        m = [[0, 0], [0, 0]]
+        B = [0, 0]
+
+        gram_schmidt(self.mat_gram_schmidt, m, mu, B)
+        assert self.mat_gram_schmidt_res == m
+
+    def test_lll_reduction_wikipedia(self):
+        mat = create_matrix(self.wikipedia_example)
+        mat_reduced = lll_reduction(mat)
+        assert self.wikipedia_example_reduced == mat_reduced
+
+    def test_is_non_lll_wikipedia(self):
+        mat = create_matrix(self.wikipedia_example)
+        assert 0 == islll(mat)
+
+    def test_is_lll_wikipedia(self):
+        mat = create_matrix(self.wikipedia_example)
+        mat_reduced = lll_reduction(mat)
+        assert 1 == islll(mat_reduced)
+
+    def test_lll_reduction_1(self):
+        mat = create_matrix(self.mat_reduction_1)
+        mat_reduced = lll_reduction(mat)
+        assert self.mat_reduction_1_reduced == mat_reduced
+
+    def test_lll_reduction_2(self):
+        mat = create_matrix(self.mat_reduction_2)
+        mat_reduced = lll_reduction(mat)
+        assert self.mat_reduction_2_reduced == mat_reduced
+
+    def test_lll_reduction_3(self):
+        mat = create_matrix(self.mat_reduction_3)
+        mat_reduced = lll_reduction(mat)
+        assert self.mat_reduction_3_reduced == mat_reduced
+
+    def test_lll_reduction_knapsack1(self):
+        first_mat = create_matrix_from_knapsack(self.pubkey, self.first_sum)
+        assert 0 == islll(first_mat)
+        first_mat_reduced = lll_reduction(first_mat)
+        assert 1 == islll(first_mat_reduced)
+        res = best_vect_knapsack(first_mat_reduced)
+        assert self.best_vect_first_sum == res
+
+    def test_lll_reduction_knapsack2(self):
+        second_mat = create_matrix_from_knapsack(self.pubkey, self.second_sum)
+        assert 0 == islll(second_mat)
+        second_mat_reduced = lll_reduction(second_mat)
+        assert 1 == islll(second_mat_reduced)
+        res = best_vect_knapsack(second_mat_reduced)
+        assert self.best_vect_second_sum == res
+
+    def test_lll_reduction_not_full_rank(self):
+        basis = create_matrix(self.not_full_rank)
+        expected_reduced_basis = create_matrix(self.not_full_rank_reduced)
+        reduced_basis = lll_reduction(basis)
+        assert expected_reduced_basis == reduced_basis
