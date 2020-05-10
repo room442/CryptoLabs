@@ -162,12 +162,12 @@ class TestLLLCase:
 
     def test_is_non_lll_wikipedia(self):
         mat = create_matrix(self.wikipedia_example)
-        assert islll(mat) == 0
+        assert islll(mat) == False
 
     def test_is_lll_wikipedia(self):
         mat = create_matrix(self.wikipedia_example)
         mat_reduced = lll_reduction(mat)
-        assert islll(mat_reduced) == 1
+        assert islll(mat_reduced) == True
 
     def test_lll_reduction_1(self):
         mat = create_matrix(self.mat_reduction_1)
@@ -186,17 +186,17 @@ class TestLLLCase:
 
     def test_lll_reduction_knapsack1(self):
         first_mat = create_matrix_from_knapsack(self.pubkey, self.first_sum)
-        assert islll(first_mat) == 0
+        assert islll(first_mat) == False
         first_mat_reduced = lll_reduction(first_mat)
-        assert islll(first_mat_reduced) == 1
+        assert islll(first_mat_reduced) == True
         res = best_vect_knapsack(first_mat_reduced)
         assert res == self.best_vect_first_sum
 
     def test_lll_reduction_knapsack2(self):
         second_mat = create_matrix_from_knapsack(self.pubkey, self.second_sum)
-        assert islll(second_mat) == 0
+        assert islll(second_mat) == False
         second_mat_reduced = lll_reduction(second_mat)
-        assert islll(second_mat_reduced) == 1
+        assert islll(second_mat_reduced) == True
         res = best_vect_knapsack(second_mat_reduced)
         assert res == self.best_vect_second_sum
 
