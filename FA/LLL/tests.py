@@ -2,24 +2,24 @@ import pytest
 from FA.LLL.LLL import *
 
 
-def test_scalar_prod():
-    a = [-3, 5, 2]
-    b = [1, -7, 2]
-    result = 32
-    assert scalar_prod(a, b) == result
+class TestScalarProdCase:
+    def setup(self):
+        self.a = [-3, 5, 2]
+        self.b = [1, -7, 3]
+        self.result = -32
 
+    def test_scalar_product(self):
+        result = scalar_prod(self.a, self.b)
+        assert self.result == result
 
-def test_norm2l():
-    v = [5, -1]
-    result = 26
-    assert norml2(v) == result
+class TestNorml2Case:
+    def setup(self):
+        self.norml2_vector = [ 5, -1]
+        self.norml2_result = 26
 
-
-def test_matrix_mult():
-    a = [[5, 3, 2], [1, 5, 6]]
-    b = [[2, 4], [1, 7], [3, 2]]
-    result = [[19, 45], [25, 51]]
-    assert matrix_mult(a, b) == result
+    def test_norml2(self):
+        res = norml2(self.norml2_vector)
+        assert self.norml2_result == res
 
 
 class TestMatrixCase:
@@ -27,9 +27,14 @@ class TestMatrixCase:
     def setup(self):
         self.a = [[5, 3, 2], [1, 5, 6]]
         self.b = [[2, 4], [1, 7], [3, 2]]
+        self.result = [[19, 45], [25, 51]]
         self.v0 = [[1, 3, 2], [3, 5, 6]]
         self.v1 = [[5, 1, 2], [1, 3, 6]]
         self.v2 = [[5, 3, 1], [1, 5, 3]]
+
+    def test_matrix_mult(self):
+        result = matrix_mult(self.a, self.b)
+        assert self.result == result
 
     def test_set_matrix_vector_0(self):
         aa = self.a
