@@ -209,7 +209,7 @@ def gram_schmidt(g, m, mu, B):
             b_j_star = get_vector(m, j)
             b_i = get_vector(g, i)
             B[j] = norml2(b_j_star)
-            mu[i][j] = scalar_prod(b_i, b_j_star), B[j]
+            mu[i][j] = scalar_prod(b_i, b_j_star)/B[j]
             # bi* = bi* - u[i][j]* bj*
             b_i_star = vector_sub(b_i_star, vector_mult_const(b_j_star, mu[i][j]))
             set_matrix_vector(m, i, b_i_star)
