@@ -120,7 +120,7 @@ class TestUtilCase:
 
     def test_round_pos(self):
         res = round(self.round_pos)
-        assert res == self.round_neg_res
+        assert res == self.round_pos_res
 
     def test_round_neg(self):
         res = round(self.round_neg)
