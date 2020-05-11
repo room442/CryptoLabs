@@ -1,6 +1,6 @@
-from MO.crypto import MOencrypt, MOdecrypt, MOgetKeys
+from CM.MO.crypto import MOencrypt, MOdecrypt, MOgetKeys
 from aes_common import AES256encrypt
-from MO.asn import MOencodeFinish, MOencodeParams, MOdecodeResponse
+from CM.MO.asn import MOencodeFinish, MOencodeParams, MOdecodeResponse
 import socket
 
 ip = "127.0.0.1"

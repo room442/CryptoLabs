@@ -1,4 +1,4 @@
-import DLP_on_curve_Polard.params as prm
+import CM.DLP_on_curve_Polard.params as prm
 from random import randint
 import curves_common as crv
 from util import modinv
