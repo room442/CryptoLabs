@@ -1,100 +1,6 @@
-## Main task:
-## TODO:   1. Написать программу, которая реализует LLL-алгоритм
-
-# TODO:   2. На простых примерах убедиться в корректности реализации.
-#   Проверить результаты работы в известных математических пакетах,
-#   например, Mathematica, Sage и др.
-
-## TODO:   3. Реализовать алгоритм решения аддитивной задачи об укладке
-#   ранца на базе LLL-алгоритма. Проанализировать, при каких входных
-#   данных алгоритм с наибольшей вероятностью успешно завершается
-#   в условиях существования решения.
-
-## TODO:   4. Обосновать полученные результаты.
-
-
-# my plan
-# TODO:
-#   - Lattice arithmetic (matrix?)
-#   - Output in human way
-#   - Vector arithmetic
-#   -
-
-
-# TODO: надо вернуться к Fraction, по крайней мере чтобы проверить, что проблема не в ошибке округления.
-
 from fractions import Fraction
-
-
-def matrix_mult(a, b):
-    m = len(a)
-    n = len(b[0])
-    p = len(a[0])
-    result = [[0 for _ in range(n)] for _ in range(m)]
-    for i in range(m):
-        for j in range(n):
-            cell = 0
-            for k in range(p):
-                cell += a[i][k] * b[k][j]
-            result[i][j] = cell
-
-    return result
-
-
-def scalar_prod(a, b):
-    result = 0
-    for i in range(len(a)):
-        result += a[i] * b[i]
-
-    return result
-
-
-def print_matrix(a):
-    maxlen = 0
-    for row in a:
-        for elem in row:
-            if len(str(elem)) > maxlen:
-                maxlen = len(str(elem))
-
-    for row in a:
-        row_str = ""
-        for elem in row:
-            difflen = maxlen - len(str(elem))
-            sep = " "
-            for i in range(difflen):
-                sep = sep + " "
-            row_str = row_str + sep + str(elem)
-        print(row_str)
-
-
-def print_vector(v):
-    print(" ".join(str(i) for i in v))
-
-
-def get_vector(n, j):
-    return [n[i][j] for i in range(len(n))]
-
-
-def vector_add(a, b):
-    return [a[i] + b[i] for i in range(len(a))]
-
-
-def vector_sub(a, b):
-    return [a[i] - b[i] for i in range(len(a))]
-
-
-def vector_mult_const(v, k):
-    return [v[i] * k for i in range(len(v))]
-
-
-def set_matrix_vector(a, k, v):
-    for i in range(len(a)):
-        a[i][k] = v[i]
-
-
-def norml2(a):
-    return scalar_prod(a, a)
-
+from FA.LLL.io import *
+from FA.LLL.lattice import *
 
 def create_matrix_from_knapsack(knap, the_sum):
     n = len(knap)
@@ -119,13 +25,6 @@ def round(num):
         return int(num + Fraction(1, 2))
     else:
         return int(num - Fraction(1, 2))
-
-
-def create_matrix(n):
-    row = len(n)
-    col = len(n[0])
-    return [ [Fraction(n[i][j]) for j in range(col) ] for i in range(row)]
-
 
 def heuristic_u_plus_v(n):
     row = len(n)
@@ -199,31 +98,6 @@ def best_vect_knapsack(n):
         for i in range(row - 1):
             solution[i] = best_vect[i]
     return solution
-
-
-# gram schmidt algorithm
-def gram_schmidt(g, m, mu, B):
-    col = len(g[0])
-
-    for i in range(col):
-        # bi* = bi
-        b_i = get_vector(g, i)
-        b_i_star = b_i
-        set_matrix_vector(m, i, b_i_star)
-
-        for j in range(i):
-            # u[i][j] = (bi, bj*)/Bj
-            b_j_star = get_vector(m, j)
-            b_i = get_vector(g, i)
-            B[j] = norml2(b_j_star)
-            mu[i][j] = Fraction(scalar_prod(b_i, b_j_star), B[j])
-            # bi* = bi* - u[i][j]* bj*
-            b_i_star = vector_sub(b_i_star, vector_mult_const(b_j_star, mu[i][j]))
-            set_matrix_vector(m, i, b_i_star)
-
-        b_i_star = get_vector(m, i)
-        # B[i] = (bi*, bi*)
-        B[i] = scalar_prod(b_i_star, b_i_star)
 
 
 def reduce(g, mu, k, l):
@@ -334,4 +208,47 @@ def islll(n, lc=Fraction(3, 4)):
 
 
 if __name__ == '__main__':
-    print("hello")
+    pubkey = [6540888028860333268, 10724927494100152566, 7437764146142504235, 10923971926220653754, 1344346752246811475, 9081586885313697235, 3154766147261118272, 6599167894240630555, 6900004602215108806, 9533144650045521276, 12494886885327238797, 9322310964898911721, 11288897190203350086, 11652486987151529360, 5819221709466577658, 4322746197318339004, 10121811235098484482, 878037699937336259, 5614291386744850395, 4785671426070643848, 12360519029676519368, 8670694547086670532, 7863700661863175326, 6835922537529215029, 11860687372009192176, 2160255437154325511, 6945405259905216278, 9234506499337280811, 7894470988622533862, 2702267599744542684, 5725983718195848294, 444144665217672832]
+
+    the_sum = 101182239602424757338
+
+    mat = create_matrix_from_knapsack(pubkey, the_sum)
+    mat_reduced = lll_reduction(mat)
+
+    best_vect = best_vect_knapsack(mat_reduced)
+
+    # try complementary ?
+    apply_complementary = True
+    for i in range(len(best_vect)):
+        if best_vect[i] != 0:
+            apply_complementary = False
+
+    if apply_complementary:
+        print("try complementary lattice")
+        total_sum = 0
+        for i in range(len(pubkey)):
+            total_sum += pubkey[i]
+
+        mat = create_matrix_from_knapsack(pubkey, total_sum-the_sum)
+        mat_reduced = lll_reduction(mat)
+
+        best_vect = best_vect_knapsack(mat_reduced)
+
+        my_sum = 0
+        for i in range(len(pubkey)):
+            if best_vect[i] == 0:
+                my_sum += pubkey[i]
+
+        print("Verification :")
+        print("my_sum = %ld, the_sum = %ld" % (my_sum, the_sum))
+
+    else:
+        my_sum = 0
+        for i in range(len(pubkey)):
+            if best_vect[i] == 1:
+                my_sum += pubkey[i]
+
+        print("Verification :")
+        print("my_sum = %ld, the_sum = %ld" % (my_sum, the_sum))
+
+    print("best_vect = ", best_vect)
