@@ -122,7 +122,9 @@ def round(num):
 
 
 def create_matrix(n):
-    return [[n[i][j] for j in range(len(n))] for i in range(len(n[0]))]
+    row = len(n)
+    col = len(n[0])
+    return [ [Fraction(n[i][j]) for j in range(col) ] for i in range(row)]
 
 
 def heuristic_u_plus_v(n):
