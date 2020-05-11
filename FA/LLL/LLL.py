@@ -21,6 +21,11 @@
 #   -
 
 
+# TODO: надо вернуться к Fraction, по крайней мере чтобы проверить, что проблема не в ошибке округления.
+
+from fractions import Fraction
+
+
 def matrix_mult(a, b):
     m = len(a)
     n = len(b[0])
@@ -100,7 +105,7 @@ def create_matrix_from_knapsack(knap, the_sum):
             if i == j:
                 result[i][j] = 1
 
-    i = n + 1
+    i = i + 1
     for k in range(n):
         result[i][k] = knap[k]
 
@@ -111,13 +116,15 @@ def create_matrix_from_knapsack(knap, the_sum):
 
 def round(num):
     if num > 0:
-        return int(num + 1 / 2)
+        return int(num + Fraction(1, 2))
     else:
-        return int(num - 1 / 2)
+        return int(num - Fraction(1, 2))
 
 
 def create_matrix(n):
-    return [[n[i][j] for j in range(len(n))] for i in range(len(n[0]))]
+    row = len(n)
+    col = len(n[0])
+    return [ [Fraction(n[i][j]) for j in range(col) ] for i in range(row)]
 
 
 def heuristic_u_plus_v(n):
@@ -209,7 +216,7 @@ def gram_schmidt(g, m, mu, B):
             b_j_star = get_vector(m, j)
             b_i = get_vector(g, i)
             B[j] = norml2(b_j_star)
-            mu[i][j] = scalar_prod(b_i, b_j_star), B[j]
+            mu[i][j] = Fraction(scalar_prod(b_i, b_j_star), B[j])
             # bi* = bi* - u[i][j]* bj*
             b_i_star = vector_sub(b_i_star, vector_mult_const(b_j_star, mu[i][j]))
             set_matrix_vector(m, i, b_i_star)
@@ -222,7 +229,7 @@ def gram_schmidt(g, m, mu, B):
 def reduce(g, mu, k, l):
     row = len(g)
 
-    if mu[k][l] > 1 / 2 or mu[k][l] < -(1 / 2):
+    if mu[k][l] > Fraction(1, 2) or mu[k][l] < -1 * Fraction(1, 2):
         r = round(mu[k][l])
         b_k = get_vector(g, k)
         b_l = get_vector(g, l)
@@ -237,7 +244,7 @@ def reduce(g, mu, k, l):
         mu[k][l] = mu[k][l] - r
 
 
-def lll_reduction(n, lc=3/4):
+def lll_reduction(n, lc=Fraction(3, 4)):
     row = len(n)
     col = len(n[0])
 
@@ -251,7 +258,7 @@ def lll_reduction(n, lc=3/4):
     # k = 2
     k = 1
 
-    while 1:
+    while True:
 
         # 1 - perform (*) for l = k - 1
         reduce(g, mu, k, k - 1)
@@ -266,10 +273,10 @@ def lll_reduction(n, lc=3/4):
             big_B = B[k] + (u * u) * B[k - 1]
 
             # mu[k][k-1] = u * B[k-1] / B
-            mu[k][k - 1] = u * (B[k - 1] / big_B)
+            mu[k][k - 1] = u * Fraction(B[k - 1], big_B)
 
             # Bk = Bk-1 * Bk / B
-            B[k] = (B[k - 1] * B[k]) / big_B
+            B[k] = Fraction((B[k - 1] * B[k]), big_B)
 
             # Bk-1 = B
             B[k - 1] = big_B
@@ -305,7 +312,7 @@ def lll_reduction(n, lc=3/4):
             k = k + 1
 
 
-def islll(n, lc=3 / 4):
+def islll(n, lc=Fraction(3, 4)):
     row = len(n)
     col = len(n[0])
 
@@ -317,7 +324,7 @@ def islll(n, lc=3 / 4):
 
     for i in range(col):
         for j in range(i):
-            if mu[i][j] > 1 / 2 or mu[i][j] < -1 / 2:
+            if mu[i][j] > Fraction(1, 2) or mu[i][j] < -1 * Fraction(1, 2):
                 return False
 
     for k in range(1, col):
