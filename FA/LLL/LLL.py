@@ -1,5 +1,6 @@
+import math
 from fractions import Fraction
-from FA.LLL.io import *
+from FA.LLL.myio import *
 from FA.LLL.lattice import *
 
 def create_matrix_from_knapsack(knap, the_sum):
@@ -18,6 +19,22 @@ def create_matrix_from_knapsack(knap, the_sum):
     result[i][k + 1] = -the_sum
 
     return result
+
+
+def my_create_matrix_from_knapsack(knap, the_sum):
+    n = len(knap)
+    m = int(0.5 * math.sqrt(n))+1
+    matrix = [[0 for _ in range(n+1)] for _ in range(n+1)] # square matrix (n+1)*(n+1)
+
+    for i in range(n):
+        matrix[i][i] = 1
+        matrix[i][n-1] = m*knap[i]
+    for i in range(n):
+        matrix[n][i] = Fraction(1, 2)
+    matrix[n][n] = m*the_sum
+
+    return matrix
+
 
 
 def round(num):
@@ -103,7 +120,7 @@ def best_vect_knapsack(n):
 def reduce(g, mu, k, l):
     row = len(g)
 
-    if mu[k][l] > Fraction(1, 2) or mu[k][l] < -1 * Fraction(1, 2):
+    if math.fabs(mu[k][l]) > Fraction(1, 2):
         r = round(mu[k][l])
         b_k = get_vector(g, k)
         b_l = get_vector(g, l)
@@ -138,7 +155,7 @@ def lll_reduction(n, lc=Fraction(3, 4)):
         reduce(g, mu, k, k - 1)
 
         # lovasz condition
-        if B[k] < (lc - mu[k][k - 1] * mu[k][k - 1]) * B[k - 1]:
+        if B[k] < ((lc - mu[k][k - 1] * mu[k][k - 1]) * B[k - 1]):
             # 2
             # u = u[k][k-1]
             u = mu[k][k - 1]
@@ -207,17 +224,13 @@ def islll(n, lc=Fraction(3, 4)):
     return True
 
 
-if __name__ == '__main__':
-    pubkey = [6540888028860333268, 10724927494100152566, 7437764146142504235, 10923971926220653754, 1344346752246811475, 9081586885313697235, 3154766147261118272, 6599167894240630555, 6900004602215108806, 9533144650045521276, 12494886885327238797, 9322310964898911721, 11288897190203350086, 11652486987151529360, 5819221709466577658, 4322746197318339004, 10121811235098484482, 878037699937336259, 5614291386744850395, 4785671426070643848, 12360519029676519368, 8670694547086670532, 7863700661863175326, 6835922537529215029, 11860687372009192176, 2160255437154325511, 6945405259905216278, 9234506499337280811, 7894470988622533862, 2702267599744542684, 5725983718195848294, 444144665217672832]
-
-    the_sum = 101182239602424757338
+def other_solution():
+    pubkey = [3780, 1337, 2902, 2101, 4410, 3629, 449, 2600, 4978, 4627]
+    the_sum = 12266
 
     mat = create_matrix_from_knapsack(pubkey, the_sum)
     mat_reduced = lll_reduction(mat)
-
     best_vect = best_vect_knapsack(mat_reduced)
-
-    # try complementary ?
     apply_complementary = True
     for i in range(len(best_vect)):
         if best_vect[i] != 0:
@@ -252,3 +265,45 @@ if __name__ == '__main__':
         print("my_sum = %ld, the_sum = %ld" % (my_sum, the_sum))
 
     print("best_vect = ", best_vect)
+
+if __name__ == '__main__':
+    pubkey = [3780, 1337, 2902, 2101, 4410, 3629, 449, 2600, 4978, 4627]
+    the_sum = 12266
+
+    n = len(pubkey)
+
+    matrix = my_create_matrix_from_knapsack(pubkey, the_sum)
+    reduction = lll_reduction(matrix)
+    result = [0] * n
+    mysum = 0
+    for b in reduction:
+        flag = True
+        for i in range(n):
+            if math.fabs(b[i]) != Fraction(1, 2):
+                flag = False
+                break
+        if flag:
+            if b[n] != 0:
+                flag = False
+                continue
+        if flag:
+            for i in range(n):
+                result[i] = b[i] + Fraction(1, 2)
+                mysum += result[i] * pubkey[i]
+            if mysum == the_sum:
+                print(F"Result: {result}")
+                break
+            mysum = 0
+            for i in range(n):
+                result[i] = -b[i] + Fraction(1, 2)
+                mysum += result[i] * pubkey[i]
+            if mysum == the_sum:
+                print(F"Result: {result}")
+                break
+
+    print("There is no result")
+    print("Try other solution")
+    other_solution()
+
+
+
