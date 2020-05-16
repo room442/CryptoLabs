@@ -75,8 +75,11 @@ def is_on_curve(P, E):
     return left == right
 
 
-def point_double(P, E):  # only Chudnovskiy
-    if is_inf(P): return P
+def point_double(PP, E):  # only Chudnovskiy
+    if is_inf(PP): return PP
+    if not is_on_curve(PP, E): raise ValueError(F"point {PP} is not on curve {E}")
+
+    P = afine_to_chudanovskiy(PP[0], PP[1], E)
 
     T1 = (P[0] * P[0]) % E[0]
     T2 = (P[1] * P[1]) % E[0]
