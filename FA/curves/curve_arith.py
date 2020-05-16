@@ -104,10 +104,39 @@ def point_add(P, Q, E):
         Q = tmp
     if is_inf(P): return Q
     if is_inf(Q): return P
-    if P == Q or
+    if not is_on_curve(Q, E): raise ValueError(F"point {Q} is not on curve {E}")
+    if not is_on_curve(P, E): raise ValueError(F"point {P} is not on curve {E}")
+    # P shuld be in Jacobian coord, and Q in Chudnovskiy
+    if len(P) != 3:
+        tmp = Q
+        Q = P
+        P = tmp
+    if not len(P) == 3 and len(Q) == 5: raise ValueError(F"Points error")
+
+    T1 = pow(P[2], 2, E[0])
+    T2 = Q[3]
+    U1 = (P[0] * T2) % E[0]
+    U2 = (Q[0] * T1) % E[0]
+
+    S1 = (P[1] * Q[2] * T2) % E[0]
+    S2 = (Q[1] * P[2] * T1) % E[0]
+    H = (U2 - U1) % E[0]
+    I = pow(2 * H, 2, E[0])
+
+    J = (H * I) % E[0]
+    r = (2 * (S2 - S1)) % E[0]
+    V = (U1 * I) % E[0]
+
+    x = (pow(r, 2, E[0]) - J - 2 * V) % E[0]
+    y = ((r * (V - x)) - 2 * S1 * J) % E[0]
+    z = ((pow(P[2] + Q[2], 2, E[0]) - T1 - T2) * H) % E[0]
+
+    return [x, y, z]
+
 
 if __name__ == '__main__':
     E = [p, A, B]
     P = [G[0], G[1], 1]
     print(is_inf(P))
     print(is_on_curve(P, E))
+    print(point_double(P, E))
