@@ -32,7 +32,7 @@ def affine_from_jacobian(x, y, z, E):
     return (x * zz_inv) % E[0], (y * zzz_inv) % E[0], (z * z_inv) % E[0]
 
 
-def afine_to_chudanovskiy(x, y, E):
+def affine_to_chudanovskiy(x, y, E):
     return x, y, 1, 1, 1
 
 
@@ -79,7 +79,7 @@ def point_double(PP, E):  # only Chudnovskiy
     if is_inf(PP): return PP
     if not is_on_curve(PP, E): raise ValueError(F"point {PP} is not on curve {E}")
 
-    P = afine_to_chudanovskiy(PP[0], PP[1], E)
+    P = affine_to_chudanovskiy(PP[0], PP[1], E)
 
     T1 = (P[0] * P[0]) % E[0]
     T2 = (P[1] * P[1]) % E[0]
@@ -97,17 +97,15 @@ def point_double(PP, E):  # only Chudnovskiy
 
 # TODO: point add, point mult on digit
 
-def point_add(P, Q, E):
-    if is_inf(P): return Q
-    if is_inf(Q): return P
-    if not is_on_curve(Q, E): raise ValueError(F"point {Q} is not on curve {E}")
-    if not is_on_curve(P, E): raise ValueError(F"point {P} is not on curve {E}")
+def point_add(PP, QQ, E):
+    if is_inf(PP): return QQ
+    if is_inf(QQ): return PP
+    if not is_on_curve(QQ, E): raise ValueError(F"point {QQ} is not on curve {E}")
+    if not is_on_curve(PP, E): raise ValueError(F"point {PP} is not on curve {E}")
     # P shuld be in Jacobian coord, and Q in Chudnovskiy
-    if len(P) != 3:
-        tmp = Q
-        Q = P
-        P = tmp
-    if not len(P) == 3 and len(Q) == 5: raise ValueError(F"Points error")
+
+    P = affine_to_jacobian(PP[0], PP[1], E)
+    Q = affine_to_chudanovskiy(QQ[0], QQ[1], E)
 
     T1 = pow(P[2], 2, E[0])
     T2 = Q[3]
@@ -127,12 +125,16 @@ def point_add(P, Q, E):
     y = ((r * (V - x)) - 2 * S1 * J) % E[0]
     z = ((pow(P[2] + Q[2], 2, E[0]) - T1 - T2) * H) % E[0]
 
-    return [x, y, z]
+    return affine_from_jacobian(x, y, z, E)
 
 
 if __name__ == '__main__':
     E = [p, A, B]
     P = [G[0], G[1], 1]
+
+    rand_P = [56294930529307888037266989938554520078909974976727867290405186147804672857970, 40227799284408618946039395270241596338545732655219360714266457471089156305972, 1]
+
     print(is_inf(P))
     print(is_on_curve(P, E))
     print(point_double(P, E))
+    print(point_add(P, rand_P, E))
