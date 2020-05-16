@@ -98,10 +98,6 @@ def point_double(PP, E):  # only Chudnovskiy
 # TODO: point add, point mult on digit
 
 def point_add(P, Q, E):
-    if len(P) != 5: # P in Chudnovsky, Q in 
-        tmp = P
-        P = Q
-        Q = tmp
     if is_inf(P): return Q
     if is_inf(Q): return P
     if not is_on_curve(Q, E): raise ValueError(F"point {Q} is not on curve {E}")
