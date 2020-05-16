@@ -1,9 +1,7 @@
 p = 115792089237316193816632940749697632410663669518650351611559539913753142201939
 A = 105628356504476664242964797754114282327459123882280107825013854231750340487961
 B = 70418904336317776161976531836076188218306082588186738550009236154500226991974
-
 G = [1, 52563562842658272751844618990493989989838273496765630840028383544556360996525]
-
 
 # find 2g, 7007G + 777000000000000000777G
 # method: doubling in Chudnovskiy coord, addition in Chudnovskiy-Jacobian coord
@@ -17,6 +15,51 @@ G = [1, 525635628426582727518446189904939899898382734967656308400283835445563609
 
 
 # Elliptic curve is [q, A, B]
+
+from util import modinv
+
+
+def affine_to_jacobian(x, y, E):
+    return x, y, 1
+
+
+def affine_from_jacobian(x, y, z, E):
+    if z == 0:
+        return 0, 1
+    z_inv = modinv(z, E[0])
+    zz_inv = modinv(pow(z, 2, E[0]), E[0])
+    zzz_inv = modinv(pow(z, 3, E[0]), E[0])
+    return (x * zz_inv) % E[0], (y * zzz_inv) % E[0], (z * z_inv) % E[0]
+
+
+def afine_to_chudanovskiy(x, y, E):
+    return x, y, 1, 1, 1
+
+
+def affine_from_chudanovskiy(x, y, z, z2, z3, E):
+    if z == 0:
+        return 0, 1
+    z_inv = modinv(z, E[0])
+    zz_inv = modinv(z2, E[0])
+    zzz_inv = modinv(z3, E[0])
+    return (x * zz_inv) % E[0], (y * zzz_inv) % E[0], (z * z_inv) % E[0]
+
+
+def jacobian_to_chudanovskuy(x, y, z, E):
+    return x, y, z, pow(z, 2, E[0]), pow(z, 3, E[0])
+
+
+def jacobian_from_chudanovskiy(x, y, z, zz, zzz, E):
+    return x, y, z
+
+
+def chudanovskiy_to_jacobian(x, y, z, zz, zzz, E):
+    return jacobian_from_chudanovskiy(x, y, z, zz, zzz, E)
+
+
+def chudanovskiy_from_jacobian(x, y, z, E):
+    return jacobian_from_chudanovskiy(x, y, z, E)
+
 
 def is_inf(P):
     return P == [1, 1, 0, 0, 0] or P == [1, 1, 0]
@@ -46,7 +89,10 @@ def point_double(P, E):  # only Chudnovskiy
     y = (M * (S - F) - 8 * T3) % E[0]
     z = (pow((P[1] + P[2]), 2, E[0]) - T2 - C) % E[0]
 
-    return [x, y, z, pow(z, 2, E[0]), pow(z, 3, E[0])]
+    return affine_from_chudanovskiy(x, y, z, pow(z, 2, E[0]), pow(z, 3, E[0]), E)
+
+
+# TODO: point add, point mult on digit
 
 def point_add(P, Q, E):
     if len(P) != 5: # P in Chudnovsky, Q in 
