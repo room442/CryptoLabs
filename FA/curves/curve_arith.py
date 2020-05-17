@@ -22,6 +22,8 @@ from math import sqrt
 
 
 def affine_to_jacobian(x, y, E):
+    if x == 0 and y == 1:
+        return 1, 1, 0
     return x, y, 1
 
 
@@ -66,7 +68,7 @@ def chudanovskiy_from_jacobian(x, y, z, E):
 
 
 def is_inf(P):
-    return P == [1, 1, 0, 0, 0] or P == [1, 1, 0]
+    return P == (1, 1, 0, 0, 0) or P == (1, 1, 0)
 
 
 def is_on_curve(P, E):
@@ -141,6 +143,8 @@ def point_double(PP, E):  # only Chudnovskiy
 # TODO: point add, point mult on digit
 
 def point_add(PP, QQ, E):
+    if PP == QQ:
+        return point_double(PP, E)
     P = affine_to_jacobian(PP[0], PP[1], E)
     Q = affine_to_chudanovskiy(QQ[0], QQ[1], E)
 
@@ -167,11 +171,38 @@ def point_mult(PP, k, E):
 
     return Q
 
+def point_mult_cool_algo(PP, k, w, E):
+    t = len(bin(k)[2:])
+    d = int(t/w)+1
+    bk = ("0" * (d*w-t)) + bin(k)[2:]
+    windows = []
+    Pi = [PP]
+    for i in range(d):
+        Ki = int(bk[i*w:(i+1)*w], 2)
+        windows.append(Ki)
+    windows.reverse()
+    for i in range(1, d):
+        P = Pi[-1]
+        for ww in range(w):
+            P = point_double(P, E)
+        Pi.append(P)
+
+    A = (0, 1, 0)
+    B = (0, 1, 0)
+
+    for j in range((2**w)-1, 2, -1):
+        for i, win in enumerate(windows):
+            if win == j:
+                B = point_add(B, Pi[i], E)
+        A = point_add(A, B, E)
+
+    return A
+
 
 def get_random_point(E, P=None):
     if P is None:
-        P = [56294930529307888037266989938554520078909974976727867290405186147804672857970,
-             40227799284408618946039395270241596338545732655219360714266457471089156305972, 1]
+        P = (56294930529307888037266989938554520078909974976727867290405186147804672857970,
+             40227799284408618946039395270241596338545732655219360714266457471089156305972, 1)
     k = random.randint(0, E[0])
 
     P = point_mult(P, k, E)
@@ -194,3 +225,9 @@ if __name__ == '__main__':
     print(point_add(P, rand_P, E))
     print(point_mult(P, 3, E))
     print(F"New random point {newR} is on curve: {is_on_curve(newR, E)}")
+
+
+
+
+    print(F"old: {point_mult(rand_P, 46237, E)}")
+    print(F"new: {point_mult_cool_algo(rand_P, 46237, 4, E)}")
