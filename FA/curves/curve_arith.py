@@ -149,6 +149,23 @@ def point_add(PP, QQ, E):
     return affine_from_jacobian(res[0], res[1], res[2], E)
 
 
+def point_mult(PP, k, E):
+    if k == 0:
+        return 0, 1
+    if k == 1:
+        return PP
+    if k == 2:
+        return point_double(PP, E)
+
+    P = affine_to_jacobian(PP[0], PP[1], E)
+    Q = affine_to_chudanovskiy(PP[0], PP[1], E)
+    Q = [0, 1, 0]  # point at inf
+    for bit in bin(k)[2:]:
+        Q = point_double(Q, E)
+        if bit == "1":
+            Q = point_add(Q, PP, E)
+
+    return Q
 
 if __name__ == '__main__':
     E = [p, A, B]
