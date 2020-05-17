@@ -79,11 +79,9 @@ def is_on_curve(P, E):
     return left == right
 
 
-def point_double(PP, E):  # only Chudnovskiy
+def point_double_chu(PP, E):  # get and retruern point in chudnovskiy coord
     if is_inf(PP): return PP
     if not is_on_curve(PP, E): raise ValueError(F"point {PP} is not on curve {E}")
-
-    P = affine_to_chudanovskiy(PP[0], PP[1], E)
 
     T1 = (P[0] * P[0]) % E[0]
     T2 = (P[1] * P[1]) % E[0]
@@ -96,20 +94,22 @@ def point_double(PP, E):  # only Chudnovskiy
     y = (M * (S - F) - 8 * T3) % E[0]
     z = (pow((P[1] + P[2]), 2, E[0]) - T2 - C) % E[0]
 
-    return affine_from_chudanovskiy(x, y, z, pow(z, 2, E[0]), pow(z, 3, E[0]), E)
+    return x, y, z, pow(z, 2, E[0]), pow(z, 3, E[0])
 
 
-# TODO: point add, point mult on digit
-
-def point_add(PP, QQ, E):
-    if is_inf(PP): return QQ
-    if is_inf(QQ): return PP
-    if not is_on_curve(QQ, E): raise ValueError(F"point {QQ} is not on curve {E}")
-    if not is_on_curve(PP, E): raise ValueError(F"point {PP} is not on curve {E}")
-    # P shuld be in Jacobian coord, and Q in Chudnovskiy
-
-    P = affine_to_jacobian(PP[0], PP[1], E)
-    Q = affine_to_chudanovskiy(QQ[0], QQ[1], E)
+def point_add_jac_chu(P, Q, E):
+    if is_inf(P):
+        if len(Q) == 3:
+            return Q
+        else:
+            return jacobian_from_chudanovskiy(Q[0], Q[1], Q[2], Q[3], Q[4], E)
+    if is_inf(Q):
+        if len(P) == 3:
+            return P
+        else:
+            return jacobian_from_chudanovskiy(P[0], P[1], P[2], P[3], P[4], E)
+    if not is_on_curve(Q, E): raise ValueError(F"point {Q} is not on curve {E}")
+    if not is_on_curve(P, E): raise ValueError(F"point {P} is not on curve {E}")
 
     T1 = pow(P[2], 2, E[0])
     T2 = Q[3]
@@ -129,7 +129,25 @@ def point_add(PP, QQ, E):
     y = ((r * (V - x)) - 2 * S1 * J) % E[0]
     z = ((pow(P[2] + Q[2], 2, E[0]) - T1 - T2) * H) % E[0]
 
-    return affine_from_jacobian(x, y, z, E)
+    return x, y, z
+
+
+def point_double(PP, E):  # only Chudnovskiy
+    P = affine_to_chudanovskiy(PP[0], PP[1], E)
+    Q = point_double_chu(P, E)
+    return affine_from_chudanovskiy(Q[0], Q[1], Q[2], Q[3], Q[4], E)
+
+
+# TODO: point add, point mult on digit
+
+def point_add(PP, QQ, E):
+    P = affine_to_jacobian(PP[0], PP[1], E)
+    Q = affine_to_chudanovskiy(QQ[0], QQ[1], E)
+
+    res = point_add_jac_chu(P, Q, E)
+
+    return affine_from_jacobian(res[0], res[1], res[2], E)
+
 
 
 if __name__ == '__main__':
