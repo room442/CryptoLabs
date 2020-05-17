@@ -33,6 +33,8 @@ def affine_from_jacobian(x, y, z, E):
 
 
 def affine_to_chudanovskiy(x, y, E):
+    if x == 0 and y == 1:
+        return 1, 1, 0, 0, 0
     return x, y, 1, 1, 1
 
 
