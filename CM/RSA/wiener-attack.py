@@ -2,8 +2,8 @@ import math
 from util import auto_int
 from frac import contFrac, getPQ
 import argparse
-from RSA.crypto import RSAencrypt
-from RSA.wiener_vuln_params import *
+from CM.RSA.crypto import RSAencrypt
+from CM.RSA.wiener_vuln_params import *
 
 
 def get_args():

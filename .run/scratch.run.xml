@@ -6,7 +6,7 @@
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
     </envs>
-    <option name="SDK_HOME" value="/Applications/SageMath-9.0.app/Contents/Resources/sage/local/bin/python3" />
+    <option name="SDK_HOME" value="$PROJECT_DIR$/venv_3.8.2/bin/python" />
     <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />

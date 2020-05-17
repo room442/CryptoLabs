@@ -1,8 +1,8 @@
-from RSA.asn import RSAdecode, RSAdecodeSign, RSAencode, RSAencodeSign
-from RSA.crypto import RSAsignCheck, RSAsignAdd, RSAdecrypt, RSAencrypt
+from CM.RSA.asn import RSAdecode, RSAdecodeSign, RSAencode, RSAencodeSign
+from CM.RSA.crypto import RSAsignCheck, RSAsignAdd, RSAdecrypt, RSAencrypt
 import aes_common
 import argparse
-from RSA.params import *
+from CM.RSA.params import *
 
 
 def parse_args():
