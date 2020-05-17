@@ -20,6 +20,9 @@ from util import modinv
 import random
 from math import sqrt
 
+from sage.all import EllipticCurve, GF
+
+
 
 def affine_to_jacobian(x, y, E):
     if x == 0 and y == 1:
@@ -211,19 +214,18 @@ def get_random_point(E, P=None):
 
 
 if __name__ == '__main__':
-    E = [p, A, B]
-    P = [G[0], G[1], 1]
+    E = EllipticCurve(GF(p), [A, B])
+    P = E(G[0], G[1])
 
-    rand_P = [56294930529307888037266989938554520078909974976727867290405186147804672857970,
-              40227799284408618946039395270241596338545732655219360714266457471089156305972, 1]
+    rand_P = E.random_point()
 
-    newR = get_random_point(E)
+    # newR = get_random_point(E)
 
     print(is_inf(P))
     print(is_on_curve(P, E))
     print(point_double(P, E))
     print(point_add(P, rand_P, E))
-    print(point_mult(P, 3, E))
+    print(point_mult(P, 11, E))
     print(F"New random point {newR} is on curve: {is_on_curve(newR, E)}")
 
 
