@@ -17,6 +17,8 @@ G = [1, 525635628426582727518446189904939899898382734967656308400283835445563609
 # Elliptic curve is [q, A, B]
 
 from util import modinv
+import random
+from math import sqrt
 
 
 def affine_to_jacobian(x, y, E):
