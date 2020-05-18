@@ -72,6 +72,20 @@ class TestArith:
         result = point_add(P, Q, E)
         assert [result[0], result[1], result[2]] == [orig[0], orig[1], orig[2]]
 
+    def test_little_doubling(self):
+        E = EllipticCurve(GF(5), [1, 2])
+        P = E.points()[1]
+        orig = 2 * P
+        result = point_double(P, E)
+        assert [result[0], result[1], result[2]] == [orig[0], orig[1], orig[2]]
+
+    def test_little_doubling_2(self):
+        E = EllipticCurve(GF(5), [2, 4])
+        P = E.points()[1]
+        orig = 2 * P
+        result = point_double(P, E)
+        assert [result[0], result[1], result[2]] == [orig[0], orig[1], orig[2]]
+
     def test_doubling(self, curve):
         E, K = curve
         P = E.random_point()
@@ -87,7 +101,6 @@ class TestArith:
         result = point_mult(P, k, E)
         assert [result[0], result[1], result[2]] == [orig[0], orig[1], orig[2]]
 
-    @pytest.mark.xfail
     def test_multipling_cool(self, curve):
         E, K = curve
         P = E.random_point()
