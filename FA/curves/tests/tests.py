@@ -44,4 +44,20 @@ class TestTransition:
         nx, ny, _ = affine_from_chudanovskiy(cx, cy, cz, czz, czzz, K)
         assert [nx, ny] == [x, y]
 
+    def test_jacobian_to_chudnovskiy_and_back(self, curve):
+        E, K = curve
+        P = E.random_point()
+        x, y, z = P[0], P[1], P[2]
+        cx, cy, cz, czz, czzz = jacobian_to_chudanovskiy(x, y, z, K)
+        jx, jy, jz = jacobian_from_chudanovskiy(cx, cy, cz, czz, czz, K)
+        assert [jx, jy, jz] == [x, y, z]
+
+    def test_jacobian_to_chudnovskiy_and_back_inf(self, curve):
+        E, K = curve
+        P = E(0, 1, 0)
+        x, y, z = P[0], P[1], P[2]
+        cx, cy, cz, czz, czzz = jacobian_to_chudanovskiy(x, y, z, K)
+        jx, jy, jz = jacobian_from_chudanovskiy(cx, cy, cz, czz, czz, K)
+        assert [jx, jy, jz] == [x, y, z]
+
 
