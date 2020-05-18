@@ -14,7 +14,7 @@ G = [1, 525635628426582727518446189904939899898382734967656308400283835445563609
 # 0 in Jacobian is (1 : 1 : 0), in Chudnovsky, resp (1 : 1 : 0 : 0 : 0)
 
 
-# Elliptic curve is [q, A, B]
+# Elliptic curve is [A, B, K.char)
 
 from util import modinv
 import random
@@ -23,156 +23,165 @@ from math import sqrt
 from sage.all import EllipticCurve, GF
 
 
-
-def affine_to_jacobian(x, y, E):
+def affine_to_jacobian(x, y):
     if x == 0 and y == 1:
         return 1, 1, 0
     return x, y, 1
 
 
-def affine_from_jacobian(x, y, z, E):
+def affine_from_jacobian(x, y, z, K):
     if z == 0:
-        return 0, 1
-    z_inv = modinv(z, E[0])
-    zz_inv = modinv(pow(z, 2, E[0]), E[0])
-    zzz_inv = modinv(pow(z, 3, E[0]), E[0])
-    return (x * zz_inv) % E[0], (y * zzz_inv) % E[0], (z * z_inv) % E[0]
+        return 0, 1, 0
+    return K((x * K(z ** (-2)))), K(y * K(z ** (-3))), K(z * K(z ** (-1)))
 
 
-def affine_to_chudanovskiy(x, y, E):
+def affine_to_chudanovskiy(x, y):
     if x == 0 and y == 1:
         return 1, 1, 0, 0, 0
     return x, y, 1, 1, 1
 
 
-def affine_from_chudanovskiy(x, y, z, z2, z3, E):
+def affine_from_chudanovskiy(x, y, z, z2, z3, K):
     if z == 0:
-        return 0, 1
-    z_inv = modinv(z, E[0])
-    zz_inv = modinv(z2, E[0])
-    zzz_inv = modinv(z3, E[0])
-    return (x * zz_inv) % E[0], (y * zzz_inv) % E[0], (z * z_inv) % E[0]
+        return 0, 1, 0
+    return K((x / z2)), K(y / z3), 1
 
 
-def jacobian_to_chudanovskuy(x, y, z, E):
-    return x, y, z, pow(z, 2, E[0]), pow(z, 3, E[0])
+def jacobian_to_chudanovskiy(x, y, z, K):
+    return x, y, z, K(pow(z, 2)), K(pow(z, 3))
 
 
-def jacobian_from_chudanovskiy(x, y, z, zz, zzz, E):
+def jacobian_from_chudanovskiy(x, y, z, zz, zzz, K=None):
     return x, y, z
 
 
-def chudanovskiy_to_jacobian(x, y, z, zz, zzz, E):
-    return jacobian_from_chudanovskiy(x, y, z, zz, zzz, E)
+def chudanovskiy_to_jacobian(x, y, z, zz, zzz, K=None):
+    return jacobian_from_chudanovskiy(x, y, z, zz, zzz, K)
 
 
-def chudanovskiy_from_jacobian(x, y, z, E):
-    return jacobian_from_chudanovskiy(x, y, z, E)
+def chudanovskiy_from_jacobian(x, y, z, K):
+    return jacobian_to_chudanovskiy(x, y, z, K)
 
 
-def is_inf(P):
+def is_inf(P):  # without sage
     return P == (1, 1, 0, 0, 0) or P == (1, 1, 0)
 
 
-def is_on_curve(P, E):
-    left = (P[1] * P[1]) % E[0]
-    if len(P) == 3:
-        right = ((pow(P[0], 3, E[0])) + (E[1] * P[0] * pow(P[2], 4, E[0])) + (E[2] * pow(P[2], 6, E[0]))) % E[0]
-    else:
-        right = ((pow(P[0], 3, E[0])) + (E[1] * P[0] * pow(P[3], 2, E[0])) + (E[2] * P[3] * P[4])) % E[0]
+def is_on_curve(x, y, z, A, B, p, zz=None, zzz=None):  # without sage
+    left = (y * y) % p
 
+    if zz is None or zzz is None or (
+            (zz == 0 and zzz == 0) or (zz == 1 and zzz == 1)):  # zz and zzz can not be 0 same time
+        zz = pow(z, 2, p)
+        zzz = pow(z, 3, p)
+    z6 = (z * zz * zzz) % p
+    # z6 = pow(z, 6, p)
+    right = (pow(x, 3, p) + (A * x * pow(zz, 2, p)) % p + (B * z6) % p) % p
     return left == right
 
 
-def point_double_chu(PP, E):  # get and retruern point in chudnovskiy coord
-    if is_inf(PP): return PP
-    if not is_on_curve(PP, E): raise ValueError(F"point {PP} is not on curve {E}")
+def point_double_chu(x, y, z, zz, zzz, A, B, p):  # get and return point in chudnovskiy coord
+    if z == 0:
+        return x, y, z, zz, zzz
+    if not is_on_curve(x, y, z, A, B, p, zz=zz, zzz=zzz): raise ValueError(
+        F"point {[x, y, z, zz, zzz]} is not on curve A={A}, B={B} over field of size {p})")
 
-    T1 = (P[0] * P[0]) % E[0]
-    T2 = (P[1] * P[1]) % E[0]
-    T3 = (T2 * T2) % E[0]
-    C = P[2]
-    S = (2 * (pow((P[0] + T2), 2, E[0]) - T1 - T3)) % E[0]
-    M = (3 * T1 + E[1] * pow(C, 2, E[0])) % E[0]
-    F = (pow(M, 2, E[0]) - 2 * S) % E[0]
-    x = F
-    y = (M * (S - F) - 8 * T3) % E[0]
-    z = (pow((P[1] + P[2]), 2, E[0]) - T2 - C) % E[0]
+    T1 = pow(x, 2, p)
+    T2 = pow(y, 2, p)
+    T3 = pow(T2, 2, p)
+    C = zz
+    # C = pow(z, 2, p)
+    S = (2 * (pow((x + T2), 2, p) - T1 - T3)) % p
+    M = (3 * T1 + A * pow(C, 2, p)) % p
+    F = (pow(M, 2, p) - 2 * S) % p
+    x2 = F
+    y2 = (M * (S - F) - 8 * T3) % p
+    z2 = (pow((y + z), 2, p) - T2 - C) % p
 
-    return x, y, z, pow(z, 2, E[0]), pow(z, 3, E[0])
+    if not is_on_curve(x2, y2, z2, A, B, p): raise ValueError(
+        F"DOUBLING ERROR: point {[x2, y2, z2]} is not on curve A={A}, B={B} over field of size {p}")
+
+    return x2, y2, z2, pow(z2, 2, p), pow(z2, 3, p)
 
 
-def point_add_jac_chu(P, Q, E):
-    if is_inf(P):
-        if len(Q) == 3:
-            return Q
-        else:
-            return jacobian_from_chudanovskiy(Q[0], Q[1], Q[2], Q[3], Q[4], E)
-    if is_inf(Q):
-        if len(P) == 3:
-            return P
-        else:
-            return jacobian_from_chudanovskiy(P[0], P[1], P[2], P[3], P[4], E)
-    if not is_on_curve(Q, E): raise ValueError(F"point {Q} is not on curve {E}")
-    if not is_on_curve(P, E): raise ValueError(F"point {P} is not on curve {E}")
+def point_add_jac_chu(px, py, pz, qx, qy, qz, qzz, qzzz, A, B, p):
+    if pz == 0:
+        return qx, qy, qz
+    if qz == 0:
+        return px, py, pz
+    if px == qx and py == qy and pz == qz:
+        return point_double_chu(qx, qy, qz, qzz, qzzz, A, B, p)
+    if not is_on_curve(qx, qy, qz, A, B, p): raise ValueError(
+        F"point {[qx, qy, qz, qzz, qzzz]} is not on curve A={A}, B={B} over field of size {p}")
+    if not is_on_curve(px, py, pz, A, B, p): raise ValueError(
+        F"point {[px, py, pz]} is not on curve A={A}, B={B} over field of size {p})")
 
-    T1 = pow(P[2], 2, E[0])
-    T2 = Q[3]
-    U1 = (P[0] * T2) % E[0]
-    U2 = (Q[0] * T1) % E[0]
+    T1 = pow(pz, 2, p)
+    T2 = qzz
+    U1 = (px * T2) % p
+    U2 = (qx * T1) % p
 
-    S1 = (P[1] * Q[2] * T2) % E[0]
-    S2 = (Q[1] * P[2] * T1) % E[0]
-    H = (U2 - U1) % E[0]
-    I = pow(2 * H, 2, E[0])
+    S1 = (py * qz * T2) % p
+    S2 = (qy * pz * T1) % p
+    H = (U2 - U1) % p
+    I = pow(2 * H, 2, p)
 
-    J = (H * I) % E[0]
-    r = (2 * (S2 - S1)) % E[0]
-    V = (U1 * I) % E[0]
+    J = (H * I) % p
+    r = (2 * (S2 - S1)) % p
+    V = (U1 * I) % p
 
-    x = (pow(r, 2, E[0]) - J - 2 * V) % E[0]
-    y = ((r * (V - x)) - 2 * S1 * J) % E[0]
-    z = ((pow(P[2] + Q[2], 2, E[0]) - T1 - T2) * H) % E[0]
+    x = (pow(r, 2, p) - J - 2 * V) % p
+    y = ((r * (V - x)) - 2 * S1 * J) % p
+    z = ((pow(pz + qz, 2, p) - T1 - T2) * H) % p
 
     return x, y, z
 
 
-def point_double(PP, E):  # only Chudnovskiy
-    P = affine_to_chudanovskiy(PP[0], PP[1], E)
-    Q = point_double_chu(P, E)
-    return affine_from_chudanovskiy(Q[0], Q[1], Q[2], Q[3], Q[4], E)
+def point_mult_chu(x, y, z, k, A, B, p):
+    qx, qy, qz, qzz, qzzz = 1, 1, 0, 0, 0
+    for bit in bin(k)[2:]:
+        qx, qy, qz, qzz, qzzz = point_double_chu(qx, qy, qz, qzz, qzzz, A, B, p)
+        if bit == "1":
+            qx, qy, qz = point_add_jac_chu(x, y, z, qx, qy, qz, qzz, qzzz, A, B, p)
+            # add returns Jacobian coord, so we need to find z^2, z^3
+            qzz = pow(qz, 2, p)
+            qzzz = pow(qz, 3, p)
+
+    return qx, qy, qz
 
 
-# TODO: point add, point mult on digit
+def point_double(PP, E):  # get Sage point, return 2*Sage point
+    x, y, z, zz, zzz = affine_to_chudanovskiy(PP[0], PP[1])
+    x, y, z, zz, zzz = point_double_chu(x, y, z, zz, zzz, E.a4(), E.a6(), E.base_field().characteristic())
+    x, y, z = affine_from_chudanovskiy(x, y, z, zz, zzz, E.base_field())
+    return E(x, y, z)
+
 
 def point_add(PP, QQ, E):
-    if PP == QQ:
-        return point_double(PP, E)
-    P = affine_to_jacobian(PP[0], PP[1], E)
-    Q = affine_to_chudanovskiy(QQ[0], QQ[1], E)
+    px, py, pz = affine_to_jacobian(PP[0], PP[1])
+    qx, qy, qz, qzz, qzzz = affine_to_chudanovskiy(QQ[0], QQ[1])
 
-    res = point_add_jac_chu(P, Q, E)
+    x, y, z = point_add_jac_chu(px, py, pz, qx, qy, qz, qzz, qzzz, E.a4(), E.a6(), E.base_field().characteristic())
 
-    return affine_from_jacobian(res[0], res[1], res[2], E)
+    x, y, z = affine_from_jacobian(x, y, z, E.base_field())
+
+    return E(x, y, z)
 
 
 def point_mult(PP, k, E):
     if k == 0:
-        return 0, 1
+        return E(0, 1, 0)
     if k == 1:
         return PP
     if k == 2:
         return point_double(PP, E)
 
-    P = affine_to_jacobian(PP[0], PP[1], E)
-    Q = affine_to_chudanovskiy(PP[0], PP[1], E)
-    Q = [0, 1, 0]  # point at inf
-    for bit in bin(k)[2:]:
-        Q = point_double(Q, E)
-        if bit == "1":
-            Q = point_add(Q, PP, E)
+    x, y, z = affine_to_jacobian(PP[0], PP[1])
+    x, y, z = point_mult_chu(x, y, z, k, E.a4(), E.a6(), E.base_field().characteristic())
+    x, y, z = affine_from_jacobian(x, y, z, E.base_field())
 
-    return Q
+    return E(x, y, z)
+
 
 def point_mult_cool_algo(PP, k, w, E):
     t = len(bin(k)[2:])
