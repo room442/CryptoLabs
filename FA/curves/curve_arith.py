@@ -24,53 +24,47 @@ from sage.all import EllipticCurve, GF
 
 
 
-def affine_to_jacobian(x, y, E):
+def affine_to_jacobian(x, y):
     if x == 0 and y == 1:
         return 1, 1, 0
     return x, y, 1
 
 
-def affine_from_jacobian(x, y, z, E):
+def affine_from_jacobian(x, y, z, K):
     if z == 0:
-        return 0, 1
-    z_inv = modinv(z, E[0])
-    zz_inv = modinv(pow(z, 2, E[0]), E[0])
-    zzz_inv = modinv(pow(z, 3, E[0]), E[0])
-    return (x * zz_inv) % E[0], (y * zzz_inv) % E[0], (z * z_inv) % E[0]
+        return 0, 1, 0
+    return K((x * K(z**(-2)))), K(y * K(z**(-3))), K(z * K(z**(-1)))
 
 
-def affine_to_chudanovskiy(x, y, E):
+def affine_to_chudanovskiy(x, y, K=None):
     if x == 0 and y == 1:
         return 1, 1, 0, 0, 0
     return x, y, 1, 1, 1
 
 
-def affine_from_chudanovskiy(x, y, z, z2, z3, E):
+def affine_from_chudanovskiy(x, y, z, z2, z3, K):
     if z == 0:
-        return 0, 1
-    z_inv = modinv(z, E[0])
-    zz_inv = modinv(z2, E[0])
-    zzz_inv = modinv(z3, E[0])
-    return (x * zz_inv) % E[0], (y * zzz_inv) % E[0], (z * z_inv) % E[0]
+        return 0, 1, 0
+    return K((x * K(z**(-2)))), K(y * K(z2**(-3))), K(z * K(z3**(-1)))
 
 
-def jacobian_to_chudanovskuy(x, y, z, E):
-    return x, y, z, pow(z, 2, E[0]), pow(z, 3, E[0])
+def jacobian_to_chudanovskiy(x, y, z, K):
+    return x, y, z, K(pow(z, 2)), K(pow(z, 3))
 
 
-def jacobian_from_chudanovskiy(x, y, z, zz, zzz, E):
+def jacobian_from_chudanovskiy(x, y, z, zz, zzz, K=None):
     return x, y, z
 
 
-def chudanovskiy_to_jacobian(x, y, z, zz, zzz, E):
-    return jacobian_from_chudanovskiy(x, y, z, zz, zzz, E)
+def chudanovskiy_to_jacobian(x, y, z, zz, zzz, K = None):
+    return jacobian_from_chudanovskiy(x, y, z, zz, zzz, K)
 
 
-def chudanovskiy_from_jacobian(x, y, z, E):
-    return jacobian_from_chudanovskiy(x, y, z, E)
+def chudanovskiy_from_jacobian(x, y, z, K):
+    return jacobian_to_chudanovskiy(x, y, z, K)
 
 
-def is_inf(P):
+def is_inf(P): # is it sage point or cortege?
     return P == (1, 1, 0, 0, 0) or P == (1, 1, 0)
 
 
