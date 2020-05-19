@@ -110,7 +110,8 @@ def point_add_jac_chu(px, py, pz, qx, qy, qz, qzz, qzzz, A, B, p):
     if qz == 0:
         return px, py, pz
     if px == qx and py == qy and pz == qz:
-        return point_double_chu(qx, qy, qz, qzz, qzzz, A, B, p)
+        x, y, z, _, _ = point_double_chu(qx, qy, qz, qzz, qzzz, A, B, p)
+        return x, y, z
     if not is_on_curve(qx, qy, qz, A, B, p): raise ValueError(
         F"point {[qx, qy, qz, qzz, qzzz]} is not on curve A={A}, B={B} over field of size {p}")
     if not is_on_curve(px, py, pz, A, B, p): raise ValueError(
@@ -203,7 +204,7 @@ def point_mult_cool_algo(PP, k, w, E):
     ax, ay, az = 1, 1, 0
     bx, by, bz, bzz, bzzz = 1, 1, 0, 0, 0
 
-    for j in range((2 ** w) - 1, 2, -1):
+    for j in range((2 ** w) - 1, 0, -1):
         for i, win in enumerate(windows):
             if win == j:
                 bx, by, bz = point_add_jac_chu(bx, by, bz, Pi[i][0], Pi[i][1], Pi[i][2], Pi[i][3], Pi[i][4], E.a4(), E.a6(), E.base_field().characteristic())
@@ -239,11 +240,11 @@ if __name__ == '__main__':
     # newR = get_random_point(E)
 
     # print(is_inf(P))
-    print(is_on_curve(P, E))
+    # print(is_on_curve(P, E))
     print(point_double(P, E))
     print(point_add(P, sage_rand_P, E))
     print(point_mult(P, 11, E))
-    print(F"New random point {newR} is on curve: {is_on_curve(newR, E)}")
+    # print(F"New random point {newR} is on curve: {is_on_curve(newR, E)}")
 
     print(F"old: {point_mult(sage_rand_P, 46237, E)}")
     print(F"new: {point_mult_cool_algo(sage_rand_P, 46237, 4, E)}")
