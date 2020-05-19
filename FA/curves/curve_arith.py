@@ -110,7 +110,8 @@ def point_add_jac_chu(px, py, pz, qx, qy, qz, qzz, qzzz, A, B, p):
     if qz == 0:
         return px, py, pz
     if px == qx and py == qy and pz == qz:
-        return point_double_chu(qx, qy, qz, qzz, qzzz, A, B, p)
+        x, y, z, _, _ = point_double_chu(qx, qy, qz, qzz, qzzz, A, B, p)
+        return x, y, z
     if not is_on_curve(qx, qy, qz, A, B, p): raise ValueError(
         F"point {[qx, qy, qz, qzz, qzzz]} is not on curve A={A}, B={B} over field of size {p}")
     if not is_on_curve(px, py, pz, A, B, p): raise ValueError(
@@ -185,30 +186,35 @@ def point_mult(PP, k, E):
 
 def point_mult_cool_algo(PP, k, w, E):
     t = len(bin(k)[2:])
-    d = int(t/w)+1
-    bk = ("0" * (d*w-t)) + bin(k)[2:]
+    d = int(t / w) + 1
+    bk = ("0" * (d * w - t)) + bin(k)[2:]
     windows = []
-    Pi = [PP]
+    x, y, z = PP
+    Pi = [[x, y, z, 1, 1]]
     for i in range(d):
-        Ki = int(bk[i*w:(i+1)*w], 2)
+        Ki = int(bk[i * w:(i + 1) * w], 2)
         windows.append(Ki)
     windows.reverse()
     for i in range(1, d):
-        P = Pi[-1]
+        x, y, z, zz, zzz = Pi[-1]
         for ww in range(w):
-            P = point_double(P, E)
-        Pi.append(P)
+            x, y, z, zz, zzz = point_double_chu(x, y, z, zz, zzz, E.a4(), E.a6(), E.base_field().characteristic())
+        Pi.append([x, y, z, zz, zzz])
 
-    A = (0, 1, 0)
-    B = (0, 1, 0)
+    ax, ay, az = 1, 1, 0
+    bx, by, bz, bzz, bzzz = 1, 1, 0, 0, 0
 
-    for j in range((2**w)-1, 2, -1):
+    for j in range((2 ** w) - 1, 0, -1):
         for i, win in enumerate(windows):
             if win == j:
-                B = point_add(B, Pi[i], E)
-        A = point_add(A, B, E)
+                bx, by, bz = point_add_jac_chu(bx, by, bz, Pi[i][0], Pi[i][1], Pi[i][2], Pi[i][3], Pi[i][4], E.a4(), E.a6(), E.base_field().characteristic())
+                bzz = pow(bz, 2, E.base_field().characteristic())
+                bzzz = pow(bz, 3, E.base_field().characteristic())
+        ax, ay, az = point_add_jac_chu(ax, ay, az, bx, by, bz, bzz, bzzz, E.a4(), E.a6(),
+                                       E.base_field().characteristic())
 
-    return A
+    ax, ay, az = affine_from_jacobian(ax, ay, az, E.base_field())
+    return E(ax, ay, az)
 
 
 def get_random_point(E, P=None):
@@ -226,19 +232,19 @@ if __name__ == '__main__':
     E = EllipticCurve(GF(p), [A, B])
     P = E(G[0], G[1])
 
-    rand_P = E.random_point()
+    # in sage every point in standart projective coord, we need to move it to jacobian
+    # all comutation in chudnovskiy and jcaoban coord, but input|output in sage-projective
+
+    sage_rand_P = E.random_point()
 
     # newR = get_random_point(E)
 
-    print(is_inf(P))
-    print(is_on_curve(P, E))
+    # print(is_inf(P))
+    # print(is_on_curve(P, E))
     print(point_double(P, E))
-    print(point_add(P, rand_P, E))
+    print(point_add(P, sage_rand_P, E))
     print(point_mult(P, 11, E))
-    print(F"New random point {newR} is on curve: {is_on_curve(newR, E)}")
+    # print(F"New random point {newR} is on curve: {is_on_curve(newR, E)}")
 
-
-
-
-    print(F"old: {point_mult(rand_P, 46237, E)}")
-    print(F"new: {point_mult_cool_algo(rand_P, 46237, 4, E)}")
+    print(F"old: {point_mult(sage_rand_P, 46237, E)}")
+    print(F"new: {point_mult_cool_algo(sage_rand_P, 46237, 4, E)}")

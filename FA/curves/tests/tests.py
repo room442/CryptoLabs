@@ -101,10 +101,18 @@ class TestArith:
         result = point_mult(P, k, E)
         assert [result[0], result[1], result[2]] == [orig[0], orig[1], orig[2]]
 
+    def test_little_multipling_cool(self):
+        E = EllipticCurve(GF(5), [2, 4])
+        P = E.points()[1]
+        k = randint(3, E.base_field().characteristic())
+        orig = k * P
+        result = point_mult_cool_algo(P, k, 4, E)
+        assert [result[0], result[1], result[2]] == [orig[0], orig[1], orig[2]]
+
     def test_multipling_cool(self, curve):
         E, K = curve
         P = E.random_point()
-        k = randint(1, K.characteristic())
+        k = randint(3, K.characteristic())
         orig = k * P
         result = point_mult_cool_algo(P, k, 4, E)
         assert [result[0], result[1], result[2]] == [orig[0], orig[1], orig[2]]
